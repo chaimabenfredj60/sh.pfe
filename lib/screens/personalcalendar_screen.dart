@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class PersonalCalendarScreen extends StatefulWidget {
-  const PersonalCalendarScreen({super.key});
+  final bool isDarkMode;
+  final String language;
+
+  const PersonalCalendarScreen({
+    super.key,
+    this.isDarkMode = false,
+    this.language = 'en',
+  });
 
   @override
   _PersonalCalendarScreenState createState() => _PersonalCalendarScreenState();
@@ -62,7 +71,8 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
       _normalizeDate(easter.add(const Duration(days: 1))): 'Lundi de Pâques',
       _normalizeDate(easter.add(const Duration(days: 39))): 'Ascension',
       _normalizeDate(easter.add(const Duration(days: 49))): 'Pentecôte',
-      _normalizeDate(easter.add(const Duration(days: 50))): 'Lundi de Pentecôte',
+      _normalizeDate(easter.add(const Duration(days: 50))):
+          'Lundi de Pentecôte',
     };
   }
 
@@ -144,7 +154,8 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFF00B4A6), width: 2),
+                  borderSide:
+                      const BorderSide(color: Color(0xFF00B4A6), width: 2),
                 ),
               ),
             ),
@@ -153,12 +164,14 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler', style: TextStyle(color: Color(0xFF6B7280))),
+            child: const Text('Annuler',
+                style: TextStyle(color: Color(0xFF6B7280))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF00B4A6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () {
               final text = controller.text.trim();
@@ -185,7 +198,8 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setStateDialog) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(
             DateFormat('d MMMM yyyy', 'fr_FR').format(selectedDay),
             style: const TextStyle(
@@ -210,7 +224,8 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.celebration, color: Color(0xFF00B4A6), size: 16),
+                        const Icon(Icons.celebration,
+                            color: Color(0xFF00B4A6), size: 16),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -259,12 +274,14 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Fermer', style: TextStyle(color: Color(0xFF6B7280))),
+              child: const Text('Fermer',
+                  style: TextStyle(color: Color(0xFF6B7280))),
             ),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00B4A6),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
               icon: const Icon(Icons.add, color: Colors.white, size: 18),
               label: const Text('Note', style: TextStyle(color: Colors.white)),
@@ -282,6 +299,7 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
   // ── Build ────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    context.watch<AppTheme>();
     final days = _getDaysInMonth(_focusedDay);
     // Semaine débutant le lundi (norme française)
     const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -317,7 +335,8 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
             }),
             child: const Text(
               "Auj.",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
           IconButton(
@@ -562,8 +581,7 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
                               GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    _userNotes[selectedNd]!
-                                        .removeAt(entry.key);
+                                    _userNotes[selectedNd]!.removeAt(entry.key);
                                     if (_userNotes[selectedNd]!.isEmpty) {
                                       _userNotes.remove(selectedNd);
                                     }
@@ -597,7 +615,8 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 4),
-          Text(label, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+          Text(label,
+              style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
         ],
       );
 
@@ -619,7 +638,9 @@ class _PersonalCalendarScreenState extends State<PersonalCalendarScreen> {
           children: [
             Icon(icon, size: 14, color: color),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 12, color: color, fontWeight: FontWeight.w600)),
           ],
         ),
       );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_theme.dart';
 
 class SidebarNavItem {
   final IconData icon;
@@ -33,152 +35,142 @@ class _LeftSidebarState extends State<LeftSidebar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 210,
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Logo ────────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
-            child: Row(
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF00B4A6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.people_alt, color: Colors.white, size: 16),
+    return Consumer<AppTheme>(
+      builder: (context, appTheme, _) {
+        return Container(
+          width: 210,
+          color: const Color(0xFFF7F8FA),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Logo ──────────────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF1C1C2E),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.people_alt,
+                          color: Colors.white, size: 16),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Cooptalite',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFF1A1A2E),
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    const Spacer(),
+                    const Icon(Icons.close,
+                        color: Color(0xFF9CA3AF), size: 18),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Cooptalite',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF1A1A2E),
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                const Spacer(),
-                Icon(Icons.add_circle_outline,
-                    color: const Color(0xFF00B4A6), size: 18),
-              ],
-            ),
-          ),
-
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
-          const SizedBox(height: 8),
-
-          // ── Nav items ───────────────────────────────────────────────────
-          _navItem(
-            icon: Icons.bar_chart_rounded,
-            label: 'Analytics',
-            route: 'analytics',
-          ),
-          _navItem(
-            icon: Icons.local_offer_outlined,
-            label: 'Offer',
-            route: 'offer',
-            hasArrow: true,
-          ),
-          _navItem(
-            icon: Icons.people_outline,
-            label: 'My Cooptation Tr...',
-            route: 'cooptation',
-          ),
-          _navItem(
-            icon: Icons.emoji_events_outlined,
-            label: 'My Challenge',
-            route: 'challenge',
-          ),
-          _navItem(
-            icon: Icons.folder_outlined,
-            label: 'RH',
-            route: 'rh',
-            hasArrow: true,
-          ),
-
-          const SizedBox(height: 4),
-
-          // ── Personal section ─────────────────────────────────────────────
-          _sectionHeader(
-            icon: Icons.edit_outlined,
-            label: 'Personal',
-            expanded: _personalExpanded,
-            onTap: () => setState(() => _personalExpanded = !_personalExpanded),
-          ),
-
-          if (_personalExpanded) ...[
-            _subNavItem(
-              icon: Icons.calendar_today_outlined,
-              label: 'Personal Calendar',
-              route: 'calendar',
-            ),
-            _subNavItem(
-              icon: Icons.check_box_outlined,
-              label: 'My Tasks',
-              route: 'tasks',
-            ),
-            _subNavItem(
-              icon: Icons.leaderboard_outlined,
-              label: 'My Results Acco...',
-              route: 'results',
-            ),
-            _subNavItem(
-              icon: Icons.rss_feed_outlined,
-              label: 'News & Events',
-              route: 'news',
-              hasArrow: true,
-            ),
-            _subNavItem(
-              icon: Icons.chat_bubble_outline,
-              label: 'Communication',
-              route: 'communication',
-              hasArrow: true,
-            ),
-            _subNavItem(
-              icon: Icons.card_giftcard_outlined,
-              label: 'My Jackpot',
-              route: 'jackpot',
-            ),
-            _subNavItem(
-              icon: Icons.assignment_outlined,
-              label: 'My applications',
-              route: 'applications',
-            ),
-          ],
-
-          const Spacer(),
-
-          // ── Bottom logo ──────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF00B4A6), Color(0xFF80CBC4)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.bolt, color: Colors.white, size: 22),
-            ),
+
+              const Divider(height: 1, color: Color(0xFFE5E7EB)),
+              const SizedBox(height: 6),
+
+              // ── Nav items ─────────────────────────────────────────────────
+              _navItem(
+                icon: Icons.bar_chart_rounded,
+                label: appTheme.translate('dashboard'),
+                subtitle: 'Vue d\'ensemble',
+                route: 'analytics',
+              ),
+              _navItem(
+                icon: Icons.local_offer_outlined,
+                label: appTheme.translate('offer'),
+                subtitle: 'Offres disponibles',
+                route: 'offer',
+                hasArrow: true,
+              ),
+              _navItem(
+                icon: Icons.folder_outlined,
+                label: appTheme.translate('rh'),
+                subtitle: 'Ressources humaines',
+                route: 'rh',
+                hasArrow: true,
+              ),
+
+              const SizedBox(height: 4),
+
+              // ── Personal section ──────────────────────────────────────────
+              _sectionHeader(
+                icon: Icons.edit_outlined,
+                label: appTheme.translate('personal'),
+                subtitle: 'Espace personnel',
+                expanded: _personalExpanded,
+                onTap: () =>
+                    setState(() => _personalExpanded = !_personalExpanded),
+              ),
+
+              if (_personalExpanded) ...[
+                _subNavItem(
+                  icon: Icons.rss_feed_outlined,
+                  label: appTheme.translate('news_events'),
+                  subtitle: 'Actualités & événements',
+                  route: 'news',
+                  hasArrow: true,
+                ),
+                _subNavItem(
+                  icon: Icons.chat_bubble_outline,
+                  label: appTheme.translate('communication'),
+                  subtitle: 'Messages & échanges',
+                  route: 'communication',
+                  hasArrow: true,
+                ),
+                _subNavItem(
+                  icon: Icons.card_giftcard_outlined,
+                  label: appTheme.translate('jackpot'),
+                  subtitle: 'Mes récompenses',
+                  route: 'jackpot',
+                ),
+                _subNavItem(
+                  icon: Icons.assignment_outlined,
+                  label: appTheme.translate('applications'),
+                  subtitle: 'Mes candidatures',
+                  route: 'applications',
+                ),
+              ],
+
+              const Spacer(),
+
+              // ── Bottom logo ───────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF00B4A6), Color(0xFF80CBC4)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.bolt, color: Colors.white, size: 22),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _navItem({
     required IconData icon,
     required String label,
+    required String subtitle,
     required String route,
     bool hasArrow = false,
   }) {
@@ -186,7 +178,7 @@ class _LeftSidebarState extends State<LeftSidebar> {
     return InkWell(
       onTap: () => widget.onRouteChanged(route),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFFE6F9F7) : Colors.transparent,
           border: isActive
@@ -200,25 +192,38 @@ class _LeftSidebarState extends State<LeftSidebar> {
                 size: 18,
                 color: isActive
                     ? const Color(0xFF00B4A6)
-                    : const Color(0xFF9E9E9E)),
+                    : const Color(0xFF9CA3AF)),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isActive
-                      ? const Color(0xFF00B4A6)
-                      : const Color(0xFF555555),
-                  fontWeight:
-                      isActive ? FontWeight.w600 : FontWeight.normal,
-                ),
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isActive
+                          ? const Color(0xFF00B4A6)
+                          : const Color(0xFF374151),
+                      fontWeight:
+                          isActive ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      color: Color(0xFFC4C9D4),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
             if (hasArrow)
-              Icon(Icons.chevron_right,
-                  size: 16, color: const Color(0xFFBDBDBD)),
+              const Icon(Icons.chevron_right,
+                  size: 16, color: Color(0xFFD1D5DB)),
           ],
         ),
       ),
@@ -228,6 +233,7 @@ class _LeftSidebarState extends State<LeftSidebar> {
   Widget _subNavItem({
     required IconData icon,
     required String label,
+    required String subtitle,
     required String route,
     bool hasArrow = false,
   }) {
@@ -235,7 +241,7 @@ class _LeftSidebarState extends State<LeftSidebar> {
     return InkWell(
       onTap: () => widget.onRouteChanged(route),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(28, 9, 16, 9),
+        padding: const EdgeInsets.fromLTRB(28, 8, 16, 8),
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFF00B4A6) : Colors.transparent,
           borderRadius: isActive ? BorderRadius.circular(6) : null,
@@ -247,25 +253,40 @@ class _LeftSidebarState extends State<LeftSidebar> {
           children: [
             Icon(icon,
                 size: 16,
-                color: isActive ? Colors.white : const Color(0xFF9E9E9E)),
+                color: isActive ? Colors.white : const Color(0xFF9CA3AF)),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isActive ? Colors.white : const Color(0xFF555555),
-                  fontWeight:
-                      isActive ? FontWeight.w600 : FontWeight.normal,
-                ),
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isActive ? Colors.white : const Color(0xFF374151),
+                      fontWeight:
+                          isActive ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: isActive
+                          ? Colors.white60
+                          : const Color(0xFFC4C9D4),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
             if (hasArrow)
               Icon(Icons.chevron_right,
                   size: 16,
                   color:
-                      isActive ? Colors.white70 : const Color(0xFFBDBDBD)),
+                      isActive ? Colors.white70 : const Color(0xFFD1D5DB)),
           ],
         ),
       ),
@@ -275,30 +296,45 @@ class _LeftSidebarState extends State<LeftSidebar> {
   Widget _sectionHeader({
     required IconData icon,
     required String label,
+    required String subtitle,
     required bool expanded,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: const Color(0xFF9E9E9E)),
+            Icon(icon, size: 18, color: const Color(0xFF9CA3AF)),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Color(0xFF555555),
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF374151),
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      color: Color(0xFFC4C9D4),
+                    ),
+                  ),
+                ],
               ),
             ),
             Icon(
-              expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+              expanded
+                  ? Icons.keyboard_arrow_down
+                  : Icons.keyboard_arrow_right,
               size: 16,
-              color: const Color(0xFFBDBDBD),
+              color: const Color(0xFFD1D5DB),
             ),
           ],
         ),

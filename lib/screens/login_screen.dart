@@ -65,30 +65,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Color(0xFF222222),
                 ),
               ),
-              const SizedBox(height: 8),
-              RichText(
-                text: const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Please ',
-                      style: TextStyle(color: primary, fontSize: 14),
-                    ),
-                    TextSpan(
-                      text: 'sign-in',
-                      style: TextStyle(
-                        color: primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                    TextSpan(
-                      text: ' to your account',
-                      style: TextStyle(color: Color(0xFF888888), fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 32),
               // Email
               const Text(
@@ -100,8 +76,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: 'john@example.com',
+                  hintText: 'john',
                   hintStyle: const TextStyle(color: Color(0xFFBBBBBB)),
+                  suffixText: '@gmail.com',
+                  suffixStyle: const TextStyle(
+                    color: Color(0xFF555555),
+                    fontSize: 14,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: const BorderSide(color: Color(0xFFDDDDDD)),
@@ -242,36 +223,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLogo() {
-    return Container(
-      width: 36,
-      height: 36,
-      child: CustomPaint(painter: _LogoPainter()),
-    );
-  }
-}
-
-class _LogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = const Color(0xFF00B4A6);
-    // Triangle shape
-    final path = Path();
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    canvas.drawPath(path, paint);
-    // Inner white triangle
-    final innerPaint = Paint()..color = Colors.white;
-    final innerPath = Path();
-    innerPath.moveTo(size.width / 2, size.height * 0.3);
-    innerPath.lineTo(size.width * 0.7, size.height * 0.75);
-    innerPath.lineTo(size.width * 0.3, size.height * 0.75);
-    innerPath.close();
-    canvas.drawPath(innerPath, innerPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget _buildLogo() => Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0xFF00B4A6).withOpacity(0.1),
+        ),
+        child: const Icon(Icons.star, color: Color(0xFF00B4A6), size: 24),
+      );
 }

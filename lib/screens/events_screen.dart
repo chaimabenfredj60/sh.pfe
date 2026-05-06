@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_theme.dart';
 
 // ── Modèle ────────────────────────────────────────────────────────────────────
 class EventItem {
@@ -47,16 +49,14 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  final _titleController     = TextEditingController();
+  final _titleController = TextEditingController();
   final _startDateController = TextEditingController();
-  final _endDateController   = TextEditingController();
+  final _endDateController = TextEditingController();
 
   List<EventItem> get _filtered {
     return _demoEvents.where((e) {
       final matchTitle = _titleController.text.isEmpty ||
-          e.title
-              .toLowerCase()
-              .contains(_titleController.text.toLowerCase());
+          e.title.toLowerCase().contains(_titleController.text.toLowerCase());
       return matchTitle;
     }).toList();
   }
@@ -80,9 +80,9 @@ class _EventsScreenState extends State<EventsScreen> {
           icon: const Icon(Icons.arrow_back, color: Color(0xFF555555)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'List of Events',
-          style: TextStyle(
+        title: Text(
+          context.watch<AppTheme>().translate('events'),
+          style: const TextStyle(
             color: Color(0xFF1A1A2E),
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -102,8 +102,9 @@ class _EventsScreenState extends State<EventsScreen> {
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
               icon: const Icon(Icons.person_add_outlined, size: 16),
-              label: const Text('Coopt a Talented Employee',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              label: Text(context.watch<AppTheme>().translate('cooptation'),
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w600)),
               onPressed: () {},
             ),
           ),
@@ -181,9 +182,8 @@ class _EventsScreenState extends State<EventsScreen> {
                     child: Wrap(
                       spacing: 16,
                       runSpacing: 16,
-                      children: _filtered
-                          .map((e) => _EventCard(event: e))
-                          .toList(),
+                      children:
+                          _filtered.map((e) => _EventCard(event: e)).toList(),
                     ),
                   ),
           ),
@@ -304,8 +304,8 @@ class _EventCard extends StatelessWidget {
                         color: Color(0xFFFFB300),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.star,
-                          color: Colors.white, size: 13),
+                      child:
+                          const Icon(Icons.star, color: Colors.white, size: 13),
                     ),
                   ],
                 ),
@@ -318,8 +318,8 @@ class _EventCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
             child: Column(
               children: [
-                _dateRow(
-                    Icons.access_time_outlined, 'Start on', event.startDate, fmt),
+                _dateRow(Icons.access_time_outlined, 'Start on',
+                    event.startDate, fmt),
                 const SizedBox(height: 4),
                 _dateRow(
                     Icons.access_time_outlined, 'End on', event.endDate, fmt),
@@ -340,8 +340,7 @@ class _EventCard extends StatelessWidget {
               child: event.imageUrl != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(6),
-                      child:
-                          Image.network(event.imageUrl!, fit: BoxFit.cover),
+                      child: Image.network(event.imageUrl!, fit: BoxFit.cover),
                     )
                   : const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -374,8 +373,8 @@ class _EventCard extends StatelessWidget {
                 ),
                 onPressed: () {},
                 child: const Text('Show Details',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 13)),
+                    style:
+                        TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
               ),
             ),
           ),
@@ -384,18 +383,15 @@ class _EventCard extends StatelessWidget {
     );
   }
 
-  Widget _dateRow(
-      IconData icon, String label, DateTime date, DateFormat fmt) {
+  Widget _dateRow(IconData icon, String label, DateTime date, DateFormat fmt) {
     return Row(
       children: [
         Icon(icon, size: 13, color: const Color(0xFF9E9E9E)),
         const SizedBox(width: 4),
         Text('$label ',
-            style:
-                const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
+            style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
         Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
           decoration: BoxDecoration(
             color: const Color(0xFFFFEBEE),
             borderRadius: BorderRadius.circular(4),

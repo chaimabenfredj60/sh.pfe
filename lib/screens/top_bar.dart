@@ -14,17 +14,6 @@ class CooptaliteTopBar extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          // ── Left: action buttons ───────────────────────────────────────
-          _actionButton(
-            icon: Icons.description_outlined,
-            label: 'Request a document or information',
-          ),
-          const SizedBox(width: 8),
-          _actionButton(
-            icon: Icons.folder_outlined,
-            label: 'My documents / responses',
-          ),
-
           const Spacer(),
 
           // ── Right: icons + user ────────────────────────────────────────
@@ -38,27 +27,6 @@ class CooptaliteTopBar extends StatelessWidget implements PreferredSizeWidget {
           Icon(Icons.dark_mode_outlined,
               size: 18, color: const Color(0xFF9E9E9E)),
           const SizedBox(width: 16),
-          Icon(Icons.search, size: 18, color: const Color(0xFF9E9E9E)),
-          const SizedBox(width: 16),
-          Stack(
-            children: [
-              Icon(Icons.notifications_outlined,
-                  size: 20, color: const Color(0xFF9E9E9E)),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF44336),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 16),
 
           // User profile
           Row(
@@ -68,7 +36,7 @@ class CooptaliteTopBar extends StatelessWidget implements PreferredSizeWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Text(
-                    'BOUGUILA Wissem',
+                    'Membre',
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -110,31 +78,6 @@ class CooptaliteTopBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _actionButton({required IconData icon, required String label}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFF00B4A6)),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: const Color(0xFF00B4A6)),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF00B4A6),
-              fontWeight: FontWeight.w500,
-            ),
           ),
         ],
       ),

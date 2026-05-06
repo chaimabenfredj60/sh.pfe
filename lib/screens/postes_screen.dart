@@ -1,687 +1,377 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_theme.dart';
 
-// ─── MODEL ──────────────────────────────────────────────────────────────────
-
-class Poste {
+class Post {
+  final String id;
   final String title;
-  final String postedBy;
-  final String tag;
+  final String author;
+  final String? avatarUrl;
+  final String category;
   final String content;
-  final int comments;
-  final String? avatarLetter;
+  int comments;
 
-  const Poste({
+  Post({
+    required this.id,
     required this.title,
-    required this.postedBy,
-    required this.tag,
+    required this.author,
+    this.avatarUrl,
+    required this.category,
     required this.content,
-    required this.comments,
-    this.avatarLetter,
+    this.comments = 0,
   });
 }
 
-// ─── SCREEN ─────────────────────────────────────────────────────────────────
-
 class PostesScreen extends StatefulWidget {
-  const PostesScreen({super.key});
+  final bool isDarkMode;
+  final String language;
 
+  const PostesScreen({
+    super.key,
+    this.isDarkMode = false,
+    this.language = 'en',
+  });
   @override
   State<PostesScreen> createState() => _PostesScreenState();
 }
 
 class _PostesScreenState extends State<PostesScreen> {
   static const Color primary = Color(0xFF00B4A6);
+  final _searchCtrl = TextEditingController();
+  String _search = '';
 
-  final TextEditingController _searchCtrl = TextEditingController();
-  String _query = '';
-
-  List<Poste> _postes = [
-    const Poste(
-      title: 'aa',
-      postedBy: 'SuperAdmin',
-      tag: 'Banking',
-      content: 'aa',
-      comments: 0,
-      avatarLetter: 'F',
-    ),
-    const Poste(
-      title: 'Test',
-      postedBy: 'KALAI Milaine',
-      tag: 'Banking',
-      content: 'Cc',
-      comments: 0,
-      avatarLetter: null,
-    ),
+  final List<Post> _posts = [
+    Post(
+        id: '1',
+        title: 'aa',
+        author: 'SuperAdmin',
+        category: 'Banking',
+        content: 'aa'),
+    Post(
+        id: '2',
+        title: 'Test',
+        author: 'KALAI Milaine',
+        category: 'Banking',
+        content: 'Cc'),
   ];
 
-  List<Poste> get _filtered {
-    if (_query.isEmpty) return _postes;
-    final q = _query.toLowerCase();
-    return _postes
-        .where((p) =>
-            p.title.toLowerCase().contains(q) ||
-            p.postedBy.toLowerCase().contains(q) ||
-            p.content.toLowerCase().contains(q))
-        .toList();
-  }
-
-  void _openAddPosteDialog() {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black45,
-      builder: (_) => AddPosteDialog(
-        onSubmit: (newPoste) {
-          setState(() => _postes.insert(0, newPoste));
-        },
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _searchCtrl.dispose();
-    super.dispose();
-  }
+  List<Post> get _filtered => _posts
+      .where((p) =>
+          _search.isEmpty ||
+          p.title.toLowerCase().contains(_search.toLowerCase()) ||
+          p.author.toLowerCase().contains(_search.toLowerCase()))
+      .toList();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFFF4F6F9),
-      child: Column(
-        children: [
-          _buildTopBar(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 20),
-                  _buildSearchAndActions(),
-                  const SizedBox(height: 20),
-                  ..._filtered.map((p) => _PosteCard(poste: p)),
-                ],
-              ),
-            ),
-          ),
-          _buildFooter(),
-        ],
-      ),
-    );
-  }
-
-  // ── TOP BAR ────────────────────────────────────────────────────────────────
-
-  Widget _buildTopBar() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      child: Row(
-        children: [
-          _outlinedBtn(Icons.description_outlined, 'Request a document or information'),
-          const SizedBox(width: 10),
-          _outlinedBtn(Icons.folder_outlined, 'My documents / responses'),
-          const Spacer(),
-          const Text('🇺🇸 English',
-              style: TextStyle(fontSize: 13, color: Color(0xFF4A5568))),
-          const SizedBox(width: 16),
-          const Icon(Icons.dark_mode_outlined, size: 20, color: Color(0xFF8A9BB0)),
-          const SizedBox(width: 12),
-          const Icon(Icons.search, size: 20, color: Color(0xFF8A9BB0)),
-          const SizedBox(width: 12),
-          Stack(children: [
-            const Icon(Icons.notifications_outlined, size: 20, color: Color(0xFF8A9BB0)),
-            Positioned(
-              right: 0, top: 0,
-              child: Container(
-                width: 8, height: 8,
-                decoration: const BoxDecoration(
-                    color: Color(0xFFFF5252), shape: BoxShape.circle),
-              ),
-            ),
-          ]),
-          const SizedBox(width: 16),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('BOUGUILA Wissem',
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A2E))),
-              Text('member',
-                  style: TextStyle(fontSize: 10, color: Color(0xFF8A9BB0))),
-            ],
-          ),
-          const SizedBox(width: 10),
-          Stack(
-            alignment: Alignment.topRight,
-            children: [
-              const CircleAvatar(
-                radius: 18,
-                backgroundColor: Color(0xFFE0E0E0),
-                child: Icon(Icons.person, color: Colors.white),
-              ),
-              Container(
-                width: 20, height: 20,
-                decoration: BoxDecoration(
-                  color: primary,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
-                ),
-                alignment: Alignment.center,
-                child: const Text('56%',
-                    style: TextStyle(
-                        fontSize: 6,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _outlinedBtn(IconData icon, String label) {
-    return OutlinedButton.icon(
-      onPressed: () {},
-      icon: Icon(icon, size: 15),
-      label: Text(label, style: const TextStyle(fontSize: 12)),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: primary,
-        side: const BorderSide(color: Color(0xFF00B4A6)),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  // ── HEADER ─────────────────────────────────────────────────────────────────
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    context.watch<AppTheme>();
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F5F7),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Header
+          Row(children: [
             const Text('Poste List',
                 style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1A1A2E))),
-            const SizedBox(height: 4),
-            Row(children: [
-              _crumb('Home', link: true),
-              const Icon(Icons.chevron_right, size: 14, color: Color(0xFF8A9BB0)),
-              _crumb('Postes'),
-            ]),
-          ],
-        ),
-        ElevatedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.send, size: 16),
-          label: const Text('Coopt a Talented Employee'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _crumb(String label, {bool link = false}) {
-    return Text(label,
-        style: TextStyle(
-            fontSize: 12,
-            color: link ? primary : const Color(0xFF4A5568),
-            fontWeight: link ? FontWeight.w500 : FontWeight.normal));
-  }
-
-  // ── SEARCH + ACTIONS ───────────────────────────────────────────────────────
-
-  Widget _buildSearchAndActions() {
-    return Row(
-      children: [
-        // Search
-        SizedBox(
-          width: 200,
-          child: TextField(
-            controller: _searchCtrl,
-            onChanged: (v) => setState(() => _query = v),
-            decoration: InputDecoration(
-              hintText: 'Search',
-              hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFB0BEC5)),
-              prefixIcon: const Icon(Icons.search, size: 18, color: Color(0xFFB0BEC5)),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFF00B4A6))),
-              contentPadding: const EdgeInsets.symmetric(vertical: 10),
-              isDense: true,
-              filled: true,
-              fillColor: Colors.white,
+            const SizedBox(width: 10),
+            _crumb('Home'),
+            const Icon(Icons.chevron_right, size: 14, color: Color(0xFF9E9E9E)),
+            _crumb('Postes', active: true),
+            const Spacer(),
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: primary,
+                  side: const BorderSide(color: primary),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+              icon: const Icon(Icons.person_add_outlined, size: 15),
+              label: const Text('Coopt a Talented Employee',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              onPressed: () {},
             ),
-          ),
-        ),
-        const Spacer(),
-        // Add Poste
-        ElevatedButton.icon(
-          onPressed: _openAddPosteDialog,
-          icon: const Icon(Icons.add, size: 16),
-          label: const Text('Add Poste'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-          ),
-        ),
-        const SizedBox(width: 10),
-        // See My Poste
-        OutlinedButton(
-          onPressed: () {},
-          style: OutlinedButton.styleFrom(
-            foregroundColor: const Color(0xFF4A5568),
-            side: const BorderSide(color: Color(0xFFE0E0E0)),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-          ),
-          child: const Text('See My Poste'),
-        ),
-      ],
-    );
-  }
-
-  // ── FOOTER ─────────────────────────────────────────────────────────────────
-
-  Widget _buildFooter() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('COPYRIGHT © 2026 , All rights Reserved',
-              style: TextStyle(fontSize: 11, color: Color(0xFF8A9BB0))),
-          Row(children: [
-            Text('Hand-crafted & Made with ',
-                style: TextStyle(fontSize: 11, color: Color(0xFF8A9BB0))),
-            Icon(Icons.favorite, size: 12, color: Colors.red),
-            Text(' by R.O',
-                style: TextStyle(fontSize: 11, color: Color(0xFF8A9BB0))),
           ]),
-        ],
+          const SizedBox(height: 14),
+
+          // Search + buttons
+          Row(children: [
+            SizedBox(
+              width: 200,
+              height: 36,
+              child: TextField(
+                controller: _searchCtrl,
+                onChanged: (v) => setState(() => _search = v),
+                style: const TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  hintText: 'Search',
+                  hintStyle:
+                      const TextStyle(fontSize: 12, color: Color(0xFFBDBDBD)),
+                  prefixIcon: const Icon(Icons.search,
+                      size: 16, color: Color(0xFFBDBDBD)),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(color: primary, width: 1.5)),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+            const Spacer(),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
+              icon: const Icon(Icons.add, size: 16),
+              label: const Text('Add Poste',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              onPressed: () => _addPostDialog(),
+            ),
+            const SizedBox(width: 8),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: primary,
+                  side: const BorderSide(color: primary),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
+              onPressed: () {},
+              child: const Text('See My Poste',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            ),
+          ]),
+          const SizedBox(height: 16),
+
+          // Posts list
+          Expanded(
+            child: _filtered.isEmpty
+                ? const Center(
+                    child: Text('Aucun post trouvé.',
+                        style: TextStyle(color: Color(0xFF9E9E9E))))
+                : ListView.separated(
+                    itemCount: _filtered.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (ctx, i) => _postCard(_filtered[i]),
+                  ),
+          ),
+        ]),
       ),
     );
   }
-}
 
-// ─── POSTE CARD ─────────────────────────────────────────────────────────────
-
-class _PosteCard extends StatelessWidget {
-  final Poste poste;
-  const _PosteCard({required this.poste});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _postCard(Post p) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 6,
               offset: const Offset(0, 2))
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Author row
-          Row(children: [
-            // Avatar
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             CircleAvatar(
-              radius: 20,
-              backgroundColor: poste.avatarLetter != null
-                  ? const Color(0xFF00B4A6)
-                  : const Color(0xFFE0E0E0),
-              child: poste.avatarLetter != null
-                  ? Text(poste.avatarLetter!,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14))
-                  : const Icon(Icons.person, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 12),
+                radius: 18,
+                backgroundColor: primary.withOpacity(0.15),
+                child: Text(p.author[0].toUpperCase(),
+                    style: const TextStyle(
+                        color: primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13))),
+            const SizedBox(width: 10),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(poste.title,
+              Text(p.title,
                   style: const TextStyle(
-                      fontSize: 14,
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                       color: Color(0xFF1A1A2E))),
-              Text('Posted By : ${poste.postedBy}',
-                  style: const TextStyle(
-                      fontSize: 12, color: Color(0xFF8A9BB0))),
+              Text('Posted By : ${p.author}',
+                  style:
+                      const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
             ]),
           ]),
-          const SizedBox(height: 12),
-
-          // Tag
-          Container(
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: const Color(0xFFFFF3E0),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(poste.tag,
+            child: Text(p.category,
                 style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFFFFA726),
+                    color: Color(0xFFFF9800),
                     fontWeight: FontWeight.w600)),
           ),
-          const SizedBox(height: 12),
-
-          // Content
-          Text(poste.content,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF4A5568))),
-          const SizedBox(height: 16),
-          const Divider(color: Color(0xFFF0F0F0)),
-
-          // Footer
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(children: [
-                const Icon(Icons.people_outline,
-                    size: 16, color: Color(0xFF8A9BB0)),
-                const SizedBox(width: 6),
-                Text('${poste.comments} Comments',
-                    style: const TextStyle(
-                        fontSize: 12, color: Color(0xFF8A9BB0))),
-              ]),
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF00B4A6),
-                    padding: EdgeInsets.zero),
-                child: const Text('Read More',
-                    style: TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w600)),
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+          child: Text(p.content,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF374151))),
+        ),
+        const Divider(height: 1, color: Color(0xFFF0F0F0)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(children: [
+            const Icon(Icons.people_outline,
+                size: 16, color: Color(0xFF9E9E9E)),
+            const SizedBox(width: 6),
+            Text('${p.comments} Comments',
+                style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
+            const Spacer(),
+            TextButton(
+              onPressed: () => _readMore(p),
+              child: const Text('Read More',
+                  style: TextStyle(
+                      color: primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600)),
+            ),
+          ]),
+        ),
+      ]),
     );
   }
-}
 
-// ─── ADD POSTE DIALOG ───────────────────────────────────────────────────────
-
-class AddPosteDialog extends StatefulWidget {
-  final Function(Poste) onSubmit;
-  const AddPosteDialog({super.key, required this.onSubmit});
-
-  @override
-  State<AddPosteDialog> createState() => _AddPosteDialogState();
-}
-
-class _AddPosteDialogState extends State<AddPosteDialog> {
-  static const Color primary = Color(0xFF00B4A6);
-
-  final _titleCtrl = TextEditingController();
-  final _descCtrl  = TextEditingController();
-  String? _selectedTag;
-  bool _hasImage = false;
-
-  static const List<String> _tags = [
-    'Fintech', 'Banking', 'Career', 'New', '2023', 'Medical', 'Healthy', 'Adventure',
-  ];
-
-  @override
-  void dispose() {
-    _titleCtrl.dispose();
-    _descCtrl.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    if (_titleCtrl.text.trim().isEmpty) return;
-    widget.onSubmit(Poste(
-      title: _titleCtrl.text.trim(),
-      postedBy: 'BOUGUILA Wissem',
-      tag: _selectedTag ?? 'General',
-      content: _descCtrl.text.trim(),
-      comments: 0,
-    ));
-    Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: SizedBox(
-        width: 480,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title bar
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  void _readMore(Post p) => showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: Text(p.title,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Spacer(),
-                  const Text('Poste',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A1A2E))),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      width: 28, height: 28,
+                  Text('By ${p.author}',
+                      style: const TextStyle(
+                          fontSize: 12, color: Color(0xFF9E9E9E))),
+                  const SizedBox(height: 8),
+                  Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE0E0E0)),
-                          borderRadius: BorderRadius.circular(6)),
-                      child: const Icon(Icons.close, size: 16, color: Color(0xFF4A5568)),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Image upload area
-              Container(
-                width: double.infinity,
-                height: 220,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE0E0E0)),
-                ),
-                child: _hasImage
-                    ? Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(color: const Color(0xFFE0E0E0),
-                              child: const Center(child: Icon(Icons.image, size: 60, color: Colors.grey))),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.camera_alt_outlined,
-                              size: 80, color: Colors.grey[300]),
-                          const SizedBox(height: 12),
-                          Text('NO IMAGE\nAVAILABLE',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[300])),
-                        ],
-                      ),
-              ),
-              const SizedBox(height: 12),
-
-              // Upload buttons
-              Row(children: [
-                ElevatedButton(
-                  onPressed: () => setState(() => _hasImage = true),
+                          color: const Color(0xFFFFF3E0),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Text(p.category,
+                          style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFFFF9800),
+                              fontWeight: FontWeight.w600))),
+                  const SizedBox(height: 12),
+                  Text(p.content,
+                      style: const TextStyle(
+                          fontSize: 13, color: Color(0xFF374151))),
+                ]),
+            actions: [
+              ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    textStyle: const TextStyle(fontSize: 13),
-                  ),
-                  child: const Text('Upload new img'),
-                ),
-                const SizedBox(width: 10),
-                OutlinedButton(
-                  onPressed: () => setState(() => _hasImage = false),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF4A5568),
-                    side: const BorderSide(color: Color(0xFFE0E0E0)),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    textStyle: const TextStyle(fontSize: 13),
-                  ),
-                  child: const Text('Reset'),
-                ),
-              ]),
-              const SizedBox(height: 4),
-              const Text('Allowed JPG, GIF or PNG.',
-                  style: TextStyle(fontSize: 11, color: Color(0xFF8A9BB0))),
-              const SizedBox(height: 16),
-
-              // Title field
-              const Text('title',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF4A5568))),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _titleCtrl,
-                decoration: _inputDeco('Enter title'),
-              ),
-              const SizedBox(height: 16),
-
-              // Description field
-              const Text('Description',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF4A5568))),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _descCtrl,
-                maxLines: 4,
-                decoration: _inputDeco('Enter description'),
-              ),
-              const SizedBox(height: 16),
-
-              // Tags dropdown
-              const Text('Tags',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF4A5568))),
-              const SizedBox(height: 6),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFE0E0E0)),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedTag,
-                    hint: const Text('Select...',
-                        style: TextStyle(fontSize: 13, color: Color(0xFFB0BEC5))),
-                    isExpanded: true,
-                    icon: const Icon(Icons.keyboard_arrow_down,
-                        color: Color(0xFF8A9BB0)),
-                    items: _tags.map((tag) => DropdownMenuItem(
-                      value: tag,
-                      child: Text(tag, style: const TextStyle(fontSize: 13)),
-                    )).toList(),
-                    onChanged: (v) => setState(() => _selectedTag = v),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Action buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: _submit,
-                    style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                    ),
-                    child: const Text('Submit'),
-                  ),
-                  const SizedBox(width: 12),
-                  OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF4A5568),
-                      side: const BorderSide(color: Color(0xFFE0E0E0)),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                    ),
-                    child: const Text('Discard'),
-                  ),
-                ],
-              ),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8))),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Fermer'))
             ],
-          ),
-        ),
-      ),
-    );
+          ));
+
+  void _addPostDialog() {
+    final titleC = TextEditingController();
+    final contentC = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              title: const Text('Add Poste',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                  width: 360,
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    TextField(
+                        controller: titleC,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            labelText: 'Titre *',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                    color: primary, width: 2)))),
+                    const SizedBox(height: 10),
+                    TextField(
+                        controller: contentC,
+                        maxLines: 4,
+                        decoration: InputDecoration(
+                            labelText: 'Contenu',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                    color: primary, width: 2)))),
+                  ])),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Annuler',
+                        style: TextStyle(color: Color(0xFF9E9E9E)))),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8))),
+                    onPressed: () {
+                      if (titleC.text.trim().isNotEmpty) {
+                        setState(() => _posts.add(Post(
+                            id: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            title: titleC.text.trim(),
+                            author: 'Membre',
+                            category: 'Banking',
+                            content: contentC.text.trim())));
+                      }
+                      Navigator.pop(ctx);
+                    },
+                    child: const Text('Ajouter')),
+              ],
+            ));
   }
 
-  InputDecoration _inputDeco(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFB0BEC5)),
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
-      enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE0E0E0))),
-      focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFF00B4A6))),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-    );
-  }
+  Widget _crumb(String label, {bool active = false}) => Text(label,
+      style: TextStyle(
+          fontSize: 12,
+          color: active ? primary : const Color(0xFF9E9E9E),
+          fontWeight: active ? FontWeight.w600 : FontWeight.normal));
 }

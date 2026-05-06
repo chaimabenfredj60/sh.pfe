@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_theme.dart';
 import 'dart:math' as math;
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -11,7 +13,7 @@ class LinkedUser {
   final String email;
   final String dailyRate;
   final String craStatus; // 'CRA not found' | 'OK'
-  final String type;      // 'profile' | 'mission' | 'AUTO'
+  final String type; // 'profile' | 'mission' | 'AUTO'
   final double gains;
   final double retraits;
 
@@ -80,7 +82,14 @@ final List<MonthlyEntry> _demoEntries = [
 // ═══════════════════════════════════════════════════════════════════════════════
 
 class MyJackpotScreen extends StatefulWidget {
-  const MyJackpotScreen({super.key});
+  final bool isDarkMode;
+  final String language;
+
+  const MyJackpotScreen({
+    super.key,
+    this.isDarkMode = false,
+    this.language = 'en',
+  });
 
   @override
   State<MyJackpotScreen> createState() => _MyJackpotScreenState();
@@ -89,9 +98,9 @@ class MyJackpotScreen extends StatefulWidget {
 class _MyJackpotScreenState extends State<MyJackpotScreen> {
   static const Color primary = Color(0xFF00B4A6);
 
-  int    _selectedYear  = 2026;
-  int    _selectedMonth = 4;
-  String _searchUser    = '';
+  int _selectedYear = 2026;
+  int _selectedMonth = 4;
+  String _searchUser = '';
 
   // ── Calculs ────────────────────────────────────────────────────────────────
 
@@ -100,7 +109,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
       .toList();
 
   /// Gains du mois sélectionné
-  double get _totalGains    => _monthEntries.fold(0, (s, e) => s + e.gains);
+  double get _totalGains => _monthEntries.fold(0, (s, e) => s + e.gains);
 
   /// Retraits du mois sélectionné
   double get _totalRetraits => _monthEntries.fold(0, (s, e) => s + e.retraits);
@@ -109,8 +118,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
   double get _jackpot => _totalGains - _totalRetraits;
 
   /// jackpot total = Σ gains tous mois - Σ retraits tous mois
-  double get _jackpotTotal =>
-      _demoEntries.fold(0.0, (s, e) => s + e.jackpot);
+  double get _jackpotTotal => _demoEntries.fold(0.0, (s, e) => s + e.jackpot);
 
   /// bonus % = (retraits / gains) * 100
   double get _bonusPercent =>
@@ -130,6 +138,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AppTheme>();
     return Scaffold(
       backgroundColor: const Color(0xFFF4F5F7),
       body: Column(
@@ -168,16 +177,18 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           Row(
             children: [
               const Text(
-                'Jackpot - BOUGUILA Wissem',
+                'Jackpot - Membre',
                 style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1A1A2E)),
               ),
               const SizedBox(width: 10),
-              const Icon(Icons.chevron_right, size: 14, color: Color(0xFF9E9E9E)),
+              const Icon(Icons.chevron_right,
+                  size: 14, color: Color(0xFF9E9E9E)),
               _crumb('Home'),
-              const Icon(Icons.chevron_right, size: 14, color: Color(0xFF9E9E9E)),
+              const Icon(Icons.chevron_right,
+                  size: 14, color: Color(0xFF9E9E9E)),
               _crumb('Jackpot', active: true),
               const Spacer(),
               OutlinedButton.icon(
@@ -228,13 +239,13 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
                 onPressed: _showPaymentDialog,
                 child: const Text('Payment Request',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 13)),
+                    style:
+                        TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
               ),
             ],
           ),
@@ -299,8 +310,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
                 _DonutChart(
                   percent: _bonusPercent.clamp(0, 100),
                   color: primary,
-                  label:
-                      '${_bonusPercent.clamp(0, 100).toStringAsFixed(0)} %',
+                  label: '${_bonusPercent.clamp(0, 100).toStringAsFixed(0)} %',
                   subLabel: 'AUTO',
                 ),
               ],
@@ -337,12 +347,10 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
                       width: 16,
                       height: 16,
                       decoration: const BoxDecoration(
-                          color: Color(0xFFF44336),
-                          shape: BoxShape.circle),
+                          color: Color(0xFFF44336), shape: BoxShape.circle),
                       child: const Center(
                         child: Text('0',
-                            style: TextStyle(
-                                color: Colors.white, fontSize: 9)),
+                            style: TextStyle(color: Colors.white, fontSize: 9)),
                       ),
                     ),
                   ),
@@ -358,8 +366,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
               Text(
                 'Total prime Amount: ${_jackpotTotal.toStringAsFixed(2)} €',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 11, color: Color(0xFF9E9E9E)),
+                style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
               ),
             ],
           ),
@@ -389,8 +396,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           // En-tête tableau
           Container(
             color: const Color(0xFFF9FAFB),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: const Row(
               children: [
                 SizedBox(width: 30),
@@ -411,8 +417,8 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
               padding: EdgeInsets.all(20),
               child: Center(
                   child: Text('Aucun utilisateur trouvé.',
-                      style: TextStyle(
-                          color: Color(0xFF9E9E9E), fontSize: 13))),
+                      style:
+                          TextStyle(color: Color(0xFF9E9E9E), fontSize: 13))),
             )
           else
             ..._filteredUsers.map(_userRow),
@@ -449,8 +455,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
-          border:
-              Border(bottom: BorderSide(color: Color(0xFFF0F0F0)))),
+          border: Border(bottom: BorderSide(color: Color(0xFFF0F0F0)))),
       child: Row(
         children: [
           // Indicateur statut
@@ -499,8 +504,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
                               color: Color(0xFF1A1A2E))),
                       Text(u.email,
                           style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF9E9E9E))),
+                              fontSize: 11, color: Color(0xFF9E9E9E))),
                     ],
                   ),
                 ),
@@ -511,14 +515,13 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           // Daily rate
           Expanded(
               child: Text(u.dailyRate,
-                  style: const TextStyle(
-                      fontSize: 12, color: Color(0xFF555555)))),
+                  style:
+                      const TextStyle(fontSize: 12, color: Color(0xFF555555)))),
 
           // CRA status badge
           Expanded(
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(
                 color: u.craStatus == 'OK'
                     ? const Color(0xFFE8F5E9)
@@ -540,15 +543,14 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           // Type
           Expanded(
               child: Text(u.type,
-                  style: const TextStyle(
-                      fontSize: 12, color: Color(0xFF555555)))),
+                  style:
+                      const TextStyle(fontSize: 12, color: Color(0xFF555555)))),
 
           // Prime %  = (retraits/gains)*100
           Expanded(
             child: Text(
               '${u.primePercent.toStringAsFixed(1)} %',
-              style: const TextStyle(
-                  fontSize: 12, color: Color(0xFF555555)),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF555555)),
             ),
           ),
 
@@ -556,8 +558,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           Expanded(
             child: Text(
               u.gainPerDay,
-              style: const TextStyle(
-                  fontSize: 12, color: Color(0xFF555555)),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF555555)),
             ),
           ),
 
@@ -596,8 +597,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           const SizedBox(height: 40),
           const Center(
             child: Text('No data to display',
-                style:
-                    TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
+                style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E))),
           ),
           const SizedBox(height: 40),
         ],
@@ -611,17 +611,15 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text('Payment Request',
             style: TextStyle(fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _dlgRow('Gains du mois',
-                '${_totalGains.toStringAsFixed(2)} €'),
-            _dlgRow('Retraits du mois',
-                '${_totalRetraits.toStringAsFixed(2)} €'),
+            _dlgRow('Gains du mois', '${_totalGains.toStringAsFixed(2)} €'),
+            _dlgRow(
+                'Retraits du mois', '${_totalRetraits.toStringAsFixed(2)} €'),
             const Divider(),
             _dlgRow('Jackpot (gains − retraits)',
                 '${_jackpot.toStringAsFixed(2)} €',
@@ -680,8 +678,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
   Widget _statLine(String label, String value) => Row(
         children: [
           Text('$label  ',
-              style: const TextStyle(
-                  fontSize: 12, color: Color(0xFF9E9E9E))),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
           Text(value,
               style: const TextStyle(
                   fontSize: 14,
@@ -690,8 +687,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
         ],
       );
 
-  Widget _dlgRow(String label, String value, {bool bold = false}) =>
-      Padding(
+  Widget _dlgRow(String label, String value, {bool bold = false}) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -703,8 +699,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
             Text(value,
                 style: TextStyle(
                     fontSize: 13,
-                    fontWeight:
-                        bold ? FontWeight.bold : FontWeight.w500,
+                    fontWeight: bold ? FontWeight.bold : FontWeight.w500,
                     color: const Color(0xFF1A1A2E))),
           ],
         ),
@@ -722,19 +717,16 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           ),
           child: Center(
               child: Text(label,
-                  style: const TextStyle(
-                      fontSize: 13, color: Color(0xFF555555)))),
+                  style:
+                      const TextStyle(fontSize: 13, color: Color(0xFF555555)))),
         ),
       );
 
-  InputDecoration _inputDecor(String hint, {Widget? prefix}) =>
-      InputDecoration(
+  InputDecoration _inputDecor(String hint, {Widget? prefix}) => InputDecoration(
         hintText: hint,
-        hintStyle:
-            const TextStyle(fontSize: 12, color: Color(0xFFBDBDBD)),
+        hintStyle: const TextStyle(fontSize: 12, color: Color(0xFFBDBDBD)),
         prefixIcon: prefix,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
           borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
@@ -758,8 +750,7 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
             items: [2024, 2025, 2026]
                 .map((y) => DropdownMenuItem(
                     value: y,
-                    child: Text('$y',
-                        style: const TextStyle(fontSize: 13))))
+                    child: Text('$y', style: const TextStyle(fontSize: 13))))
                 .toList(),
             onChanged: (v) => setState(() => _selectedYear = v!),
             icon: const Icon(Icons.keyboard_arrow_down, size: 18),
@@ -772,14 +763,13 @@ class _MyJackpotScreenState extends State<MyJackpotScreen> {
           child: DropdownButton<int>(
             value: _selectedMonth,
             items: List.generate(
-                    12,
-                    (i) => DropdownMenuItem(
-                          value: i + 1,
-                          child: Text(
-                              '$_selectedYear-${(i + 1).toString().padLeft(2, '0')}',
-                              style: const TextStyle(fontSize: 13)),
-                        ))
-                .toList(),
+                12,
+                (i) => DropdownMenuItem(
+                      value: i + 1,
+                      child: Text(
+                          '$_selectedYear-${(i + 1).toString().padLeft(2, '0')}',
+                          style: const TextStyle(fontSize: 13)),
+                    )).toList(),
             onChanged: (v) => setState(() => _selectedMonth = v!),
             icon: const Icon(Icons.keyboard_arrow_down, size: 18),
           ),
@@ -832,12 +822,10 @@ class _DonutChart extends StatelessWidget {
             children: [
               Text(label,
                   style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: color)),
+                      fontWeight: FontWeight.bold, fontSize: 15, color: color)),
               Text(subLabel,
-                  style: const TextStyle(
-                      fontSize: 10, color: Color(0xFF9E9E9E))),
+                  style:
+                      const TextStyle(fontSize: 10, color: Color(0xFF9E9E9E))),
             ],
           ),
         ],

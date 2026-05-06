@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_theme.dart';
 
 // ── Modèle ────────────────────────────────────────────────────────────────────
 class NewsArticle {
@@ -39,38 +41,42 @@ class NewsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F5F7),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF555555)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'News',
-          style: TextStyle(
-            color: Color(0xFF1A1A2E),
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+    return Consumer<AppTheme>(
+      builder: (context, appTheme, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF4F5F7),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Color(0xFF555555)),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              appTheme.translate('my_news'),
+              style: const TextStyle(
+                color: Color(0xFF1A1A2E),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            bottom: const PreferredSize(
+              preferredSize: Size.fromHeight(1),
+              child: Divider(height: 1, color: Color(0xFFE0E0E0)),
+            ),
           ),
-        ),
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, color: Color(0xFFE0E0E0)),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: _demoNews
-              .map((article) => _NewsCard(article: article))
-              .toList(),
-        ),
-      ),
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: _demoNews
+                  .map((article) => _NewsCard(article: article))
+                  .toList(),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -154,10 +160,10 @@ class _NewsCard extends StatelessWidget {
                       ),
                     ),
                     onPressed: () => _showDetails(context, article),
-                    child: const Text(
-                      'Details',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 13),
+                    child: Text(
+                      context.watch<AppTheme>().translate('read_more'),
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                     ),
                   ),
                 ),
@@ -173,14 +179,13 @@ class _NewsCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(article.title,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         content: SingleChildScrollView(
           child: Text(article.body,
-              style:
-                  const TextStyle(fontSize: 13, color: Color(0xFF555555), height: 1.6)),
+              style: const TextStyle(
+                  fontSize: 13, color: Color(0xFF555555), height: 1.6)),
         ),
         actions: [
           TextButton(
