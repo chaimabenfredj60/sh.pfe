@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_theme.dart';
+import 'cv_list_screen.dart';
 
 class SidebarNavItem {
   final IconData icon;
@@ -19,11 +20,13 @@ class SidebarNavItem {
 class LeftSidebar extends StatefulWidget {
   final String activeRoute;
   final ValueChanged<String> onRouteChanged;
+  final String userId;
 
   const LeftSidebar({
     super.key,
     required this.activeRoute,
     required this.onRouteChanged,
+    this.userId = 'user123',
   });
 
   @override
@@ -69,8 +72,7 @@ class _LeftSidebarState extends State<LeftSidebar> {
                       ),
                     ),
                     const Spacer(),
-                    const Icon(Icons.close,
-                        color: Color(0xFF9CA3AF), size: 18),
+                    const Icon(Icons.close, color: Color(0xFF9CA3AF), size: 18),
                   ],
                 ),
               ),
@@ -138,6 +140,12 @@ class _LeftSidebarState extends State<LeftSidebar> {
                   label: appTheme.translate('applications'),
                   subtitle: 'Mes candidatures',
                   route: 'applications',
+                ),
+                _cvNavItem(
+                  icon: Icons.description_outlined,
+                  label: 'Mes CVs',
+                  subtitle: 'Gérer mes curriculum vitae',
+                  userId: widget.userId,
                 ),
               ],
 
@@ -273,9 +281,8 @@ class _LeftSidebarState extends State<LeftSidebar> {
                     subtitle,
                     style: TextStyle(
                       fontSize: 10.5,
-                      color: isActive
-                          ? Colors.white60
-                          : const Color(0xFFC4C9D4),
+                      color:
+                          isActive ? Colors.white60 : const Color(0xFFC4C9D4),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -285,8 +292,7 @@ class _LeftSidebarState extends State<LeftSidebar> {
             if (hasArrow)
               Icon(Icons.chevron_right,
                   size: 16,
-                  color:
-                      isActive ? Colors.white70 : const Color(0xFFD1D5DB)),
+                  color: isActive ? Colors.white70 : const Color(0xFFD1D5DB)),
           ],
         ),
       ),
@@ -330,12 +336,66 @@ class _LeftSidebarState extends State<LeftSidebar> {
               ),
             ),
             Icon(
-              expanded
-                  ? Icons.keyboard_arrow_down
-                  : Icons.keyboard_arrow_right,
+              expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
               size: 16,
               color: const Color(0xFFD1D5DB),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cvNavItem({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required String userId,
+  }) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CvListScreen(userId: userId),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(28, 8, 16, 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: const Color(0xFF9CA3AF)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF374151),
+                      fontWeight: FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFFC4C9D4),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward, size: 14, color: Color(0xFFD1D5DB)),
           ],
         ),
       ),

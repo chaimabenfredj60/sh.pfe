@@ -7,12 +7,11 @@ class TopBar extends StatefulWidget {
   final VoidCallback? onApplication;
   final VoidCallback? onJackpot;
   final VoidCallback? onChats;
+  final VoidCallback? onCv;
   final VoidCallback? onSupport;
   final VoidCallback? onLogout;
   final Function(String)? onLanguageChanged;
-  final Function(bool)? onThemeChanged;
   final String currentLanguage;
-  final bool isDarkMode;
 
   const TopBar({
     Key? key,
@@ -20,12 +19,11 @@ class TopBar extends StatefulWidget {
     this.onApplication,
     this.onJackpot,
     this.onChats,
+    this.onCv,
     this.onSupport,
     this.onLogout,
     this.onLanguageChanged,
-    this.onThemeChanged,
     this.currentLanguage = 'en',
-    this.isDarkMode = false,
   }) : super(key: key);
 
   @override
@@ -33,13 +31,11 @@ class TopBar extends StatefulWidget {
 }
 
 class _TopBarState extends State<TopBar> {
-  late bool _isDarkMode;
   late String _language;
 
   @override
   void initState() {
     super.initState();
-    _isDarkMode = widget.isDarkMode;
     _language = widget.currentLanguage;
   }
 
@@ -51,31 +47,27 @@ class _TopBarState extends State<TopBar> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: _isDarkMode ? Colors.grey[900] : Colors.white,
+      color: Colors.white,
       child: Row(
         children: [
           const Spacer(),
-          // Right side - Actions & User
           Row(
             children: [
               // Language Dropdown
               DropdownButton<String>(
                 value: _language,
                 underline: const SizedBox(),
-                icon: Icon(Icons.language,
-                    size: 18, color: _isDarkMode ? Colors.white : Colors.grey),
+                icon: const Icon(Icons.language, size: 18, color: Colors.grey),
                 items: [
                   DropdownMenuItem(
                     value: 'en',
                     child: Text('English',
-                        style: TextStyle(
-                            color: _isDarkMode ? Colors.white : Colors.black)),
+                        style: const TextStyle(color: Colors.black)),
                   ),
                   DropdownMenuItem(
                     value: 'fr',
                     child: Text('Français',
-                        style: TextStyle(
-                            color: _isDarkMode ? Colors.white : Colors.black)),
+                        style: const TextStyle(color: Colors.black)),
                   ),
                 ],
                 onChanged: (value) {
@@ -85,20 +77,6 @@ class _TopBarState extends State<TopBar> {
                   }
                 },
               ),
-              const SizedBox(width: 8),
-              // Dark mode toggle
-              IconButton(
-                icon: Icon(
-                  _isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                  size: 20,
-                  color: _isDarkMode ? Colors.white : Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() => _isDarkMode = !_isDarkMode);
-                  widget.onThemeChanged?.call(_isDarkMode);
-                },
-                tooltip: 'Toggle Dark Mode',
-              ),
               const SizedBox(width: 16),
               // User Profile
               Row(
@@ -106,21 +84,20 @@ class _TopBarState extends State<TopBar> {
                   CircleAvatar(
                     radius: 16,
                     backgroundColor: Colors.grey[300],
-                    child: Icon(Icons.person,
-                        size: 18,
-                        color: _isDarkMode ? Colors.grey[800] : Colors.grey),
+                    child:
+                        const Icon(Icons.person, size: 18, color: Colors.grey),
                   ),
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         'Membre',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: _isDarkMode ? Colors.white : Colors.black,
+                          color: Colors.black,
                         ),
                       ),
                       Container(
@@ -146,8 +123,8 @@ class _TopBarState extends State<TopBar> {
               const SizedBox(width: 8),
               // Dropdown menu
               PopupMenuButton<String>(
-                icon: Icon(Icons.expand_more,
-                    size: 20, color: _isDarkMode ? Colors.white : Colors.grey),
+                icon:
+                    const Icon(Icons.expand_more, size: 20, color: Colors.grey),
                 onSelected: (String value) {
                   switch (value) {
                     case 'profile':
@@ -161,6 +138,9 @@ class _TopBarState extends State<TopBar> {
                       break;
                     case 'chats':
                       widget.onChats?.call();
+                      break;
+                    case 'cv':
+                      widget.onCv?.call();
                       break;
                     case 'support':
                       showDialog(
@@ -179,9 +159,7 @@ class _TopBarState extends State<TopBar> {
                     value: 'profile',
                     child: Row(
                       children: [
-                        Icon(Icons.person,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
+                        const Icon(Icons.person, size: 18, color: Colors.grey),
                         const SizedBox(width: 10),
                         Text(_translate('profile')),
                       ],
@@ -191,9 +169,8 @@ class _TopBarState extends State<TopBar> {
                     value: 'application',
                     child: Row(
                       children: [
-                        Icon(Icons.edit_note,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
+                        const Icon(Icons.edit_note,
+                            size: 18, color: Colors.grey),
                         const SizedBox(width: 10),
                         Text(_translate('my_application')),
                       ],
@@ -203,9 +180,7 @@ class _TopBarState extends State<TopBar> {
                     value: 'jackpot',
                     child: Row(
                       children: [
-                        Icon(Icons.casino,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
+                        const Icon(Icons.casino, size: 18, color: Colors.grey),
                         const SizedBox(width: 10),
                         Text(_translate('my_jackpot')),
                       ],
@@ -215,11 +190,20 @@ class _TopBarState extends State<TopBar> {
                     value: 'chats',
                     child: Row(
                       children: [
-                        Icon(Icons.chat,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
+                        const Icon(Icons.chat, size: 18, color: Colors.grey),
                         const SizedBox(width: 10),
                         Text(_translate('chats')),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'cv',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.description,
+                            size: 18, color: Colors.grey),
+                        const SizedBox(width: 10),
+                        const Text('Mes CVs'),
                       ],
                     ),
                   ),
@@ -227,9 +211,7 @@ class _TopBarState extends State<TopBar> {
                     value: 'support',
                     child: Row(
                       children: [
-                        Icon(Icons.help,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
+                        const Icon(Icons.help, size: 18, color: Colors.grey),
                         const SizedBox(width: 10),
                         Text(_translate('support')),
                       ],
@@ -252,7 +234,7 @@ class _TopBarState extends State<TopBar> {
             ],
           ),
         ],
-      ),
+      ), // ← parenthèse fermante du Container manquante
     );
   }
-}
+} // ← accolade fermante de _TopBarState manquante

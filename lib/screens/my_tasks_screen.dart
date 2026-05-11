@@ -8,12 +8,10 @@ import '../providers/app_theme.dart';
 import '../utils/theme_colors.dart';
 
 class MyTasksScreen extends StatefulWidget {
-  final bool isDarkMode;
   final String language;
 
   const MyTasksScreen({
     super.key,
-    this.isDarkMode = false,
     this.language = 'en',
   });
 
@@ -67,11 +65,10 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final appTheme = context.watch<AppTheme>();
 
     return Scaffold(
-      backgroundColor: ThemeColors.getBgColor(isDark),
+      backgroundColor: ThemeColors.getBgColor(),
       appBar: AppBar(
         title: Text(appTheme.translate('my_tasks')),
         centerTitle: false,
@@ -105,7 +102,7 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
           ),
           VerticalDivider(
             width: 1,
-            color: ThemeColors.getBorderColor(isDark),
+            color: ThemeColors.getBorderColor(),
           ),
           // Task List (Right)
           Expanded(

@@ -4,12 +4,10 @@ import '../providers/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class PersonalCalendarScreen extends StatefulWidget {
-  final bool isDarkMode;
   final String language;
 
   const PersonalCalendarScreen({
     super.key,
-    this.isDarkMode = false,
     this.language = 'en',
   });
 

@@ -40,12 +40,10 @@ class DayActivity {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 class CraScreen extends StatefulWidget {
-  final bool isDarkMode;
   final String language;
 
   const CraScreen({
     super.key,
-    this.isDarkMode = false,
     this.language = 'en',
   });
   @override
@@ -159,7 +157,7 @@ class _CraScreenState extends State<CraScreen> {
   // ── Build ──────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    context.watch<AppTheme>();
+    final appTheme = context.watch<AppTheme>();
     final wide = _isWide(context);
 
     return Scaffold(
@@ -167,7 +165,7 @@ class _CraScreenState extends State<CraScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _banner(),
+          _banner(appTheme),
           const SizedBox(height: 14),
           if (wide) _wideLayout() else _narrowLayout(),
         ]),
@@ -222,7 +220,7 @@ class _CraScreenState extends State<CraScreen> {
       ]);
 
   // ── Banner ─────────────────────────────────────────────────────────────────
-  Widget _banner() => Container(
+  Widget _banner(AppTheme appTheme) => Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: const Color(0xFFF0FDF9),
@@ -230,15 +228,14 @@ class _CraScreenState extends State<CraScreen> {
           border: Border.all(color: const Color(0xFFBBF7F0)),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _bRow(
-              'Please make sure that you click on the button at the bottom to send the CRA for validation.'),
+          _bRow(appTheme.translate('cra_banner_validation')),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              _bRow('If you want to attach a signed client CRA:'),
+              _bRow(appTheme.translate('cra_banner_attach')),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: primary,
@@ -249,9 +246,9 @@ class _CraScreenState extends State<CraScreen> {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 ),
                 icon: const Icon(Icons.upload_file, size: 14),
-                label: const Text('Import CRA',
-                    style:
-                        TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                label: Text(appTheme.translate('cra_button_import'),
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w600)),
                 onPressed: () {},
               ),
             ],
@@ -262,7 +259,7 @@ class _CraScreenState extends State<CraScreen> {
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              _bRow("Don't know how to do it?"),
+              _bRow(appTheme.translate('cra_banner_help_question')),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primary,
@@ -274,13 +271,13 @@ class _CraScreenState extends State<CraScreen> {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 ),
                 onPressed: () {},
-                child:
-                    const Text('Cliquez ici', style: TextStyle(fontSize: 12)),
+                child: Text(appTheme.translate('cra_button_help_link'),
+                    style: const TextStyle(fontSize: 12)),
               ),
               TextButton(
                   onPressed: () {},
-                  child: const Text('By Beeline',
-                      style: TextStyle(
+                  child: Text(appTheme.translate('cra_help_by'),
+                      style: const TextStyle(
                           color: primary,
                           fontSize: 12,
                           fontWeight: FontWeight.w600))),

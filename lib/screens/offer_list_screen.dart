@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
+import '../providers/app_theme.dart';
 
 // ─── COLORS ──────────────────────────────────────────────────────────────────
 const Color kPrimary = Color(0xFF00B4A6);
@@ -381,14 +384,12 @@ final List<Offer> kInitialOffers = [
 class OfferListScreen extends StatefulWidget {
   final void Function(dynamic offer)? onOfferTap;
   final String activeSubItem;
-  final bool isDarkMode;
   final String language;
 
   const OfferListScreen({
     super.key,
     this.onOfferTap,
     this.activeSubItem = 'Liste des offres',
-    this.isDarkMode = false,
     this.language = 'en',
   });
 
@@ -469,6 +470,7 @@ class _OfferListScreenState extends State<OfferListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = context.watch<AppTheme>();
     if (_detailOffer != null) {
       return OfferDetailScreen(offer: _detailOffer!, onBack: _closeDetail);
     }
@@ -493,14 +495,12 @@ class _OfferListScreenState extends State<OfferListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Liste des offres',
-                        style: TextStyle(
+                    Text(appTheme.translate('offers_list_title'),
+                        style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: kDark)),
                     const SizedBox(height: 14),
-
-                    // Stat cards — stacked vertically on mobile
                     _MobileStatCard(
                         icon: Icons.work_outline,
                         count: _offers.length,
@@ -516,8 +516,6 @@ class _OfferListScreenState extends State<OfferListScreen> {
                         count: freelanceCount,
                         label: 'FREELANCE'),
                     const SizedBox(height: 16),
-
-                    // Search
                     TextField(
                       controller: _searchCtrl,
                       onChanged: (v) => setState(() => _search = v),
@@ -525,8 +523,6 @@ class _OfferListScreenState extends State<OfferListScreen> {
                       style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 12),
-
-                    // Filters — full width dropdowns
                     _MobileFilterDropdown(
                       label: 'Type',
                       options: kTypeOptions,
@@ -556,8 +552,6 @@ class _OfferListScreenState extends State<OfferListScreen> {
                       onChange: (v) => setState(() => _selectedRecent = v),
                     ),
                     const SizedBox(height: 10),
-
-                    // Action buttons row
                     Row(
                       children: [
                         Expanded(
@@ -596,14 +590,12 @@ class _OfferListScreenState extends State<OfferListScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-
                     Text('${filtered.length} result(s)',
                         style: const TextStyle(
                             fontSize: 13,
                             color: kGrey,
                             fontWeight: FontWeight.w500)),
                     const SizedBox(height: 10),
-
                     if (filtered.isEmpty)
                       const Padding(
                         padding: EdgeInsets.only(top: 40),
@@ -870,7 +862,6 @@ class _MobileOfferCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // Company icon placeholder
               Container(
                 width: 42,
                 height: 42,
@@ -916,8 +907,6 @@ class _MobileOfferCard extends StatelessWidget {
               ),
             ]),
           ),
-
-          // Description
           if (offer.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
@@ -927,8 +916,6 @@ class _MobileOfferCard extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis),
             ),
-
-          // Tags
           if (offer.tags.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
@@ -940,8 +927,6 @@ class _MobileOfferCard extends StatelessWidget {
                   _MobileTagChip('+${offer.extraTags}', dim: true),
               ]),
             ),
-
-          // Bottom meta row
           Container(
             padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
             decoration: const BoxDecoration(
@@ -1040,7 +1025,7 @@ class _MetaBadge extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// OFFER DETAIL SCREEN — Mobile
+// OFFER DETAIL SCREEN
 // ═══════════════════════════════════════════════════════════════════════════════
 class OfferDetailScreen extends StatefulWidget {
   final Offer offer;
@@ -1093,7 +1078,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top bar
             Container(
               color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -1145,14 +1129,12 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                 const SizedBox(width: 8),
               ]),
             ),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(14),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Mini stat cards — 2 per row
                       Row(children: [
                         Expanded(
                             child: _MiniStatCard(
@@ -1185,8 +1167,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                                 label: 'Avg. Score')),
                       ]),
                       const SizedBox(height: 14),
-
-                      // Main offer card
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -1197,7 +1177,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Header
                               Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Column(
@@ -1250,8 +1229,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                               ),
                               const Divider(
                                   height: 1, color: Color(0xFFF3F4F6)),
-
-                              // Meta grid
                               Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Column(children: [
@@ -1299,8 +1276,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                               ),
                               const Divider(
                                   height: 1, color: Color(0xFFF3F4F6)),
-
-                              // Tags
                               Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Wrap(
@@ -1312,8 +1287,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                               ),
                               const Divider(
                                   height: 1, color: Color(0xFFF3F4F6)),
-
-                              // Description
                               Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Container(
@@ -1333,8 +1306,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                                   ),
                                 ),
                               ),
-
-                              // Fill rate
                               Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(16, 0, 16, 6),
@@ -1363,8 +1334,6 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                                   ),
                                 ),
                               ),
-
-                              // Action buttons
                               Container(
                                 decoration: const BoxDecoration(
                                     border: Border(
@@ -1426,8 +1395,10 @@ class _OfferDetailScreenState extends State<OfferDetailScreen> {
                                             borderRadius:
                                                 BorderRadius.circular(8)),
                                         child: Row(children: [
-                                          Icon(Icons.emoji_events_outlined,
-                                              size: 16, color: kPrimary),
+                                          const Icon(
+                                              Icons.emoji_events_outlined,
+                                              size: 16,
+                                              color: kPrimary),
                                           const SizedBox(width: 6),
                                           const Text('Score: 0%',
                                               style: TextStyle(
@@ -1594,6 +1565,223 @@ class _SkillTag extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// DROP ZONE — avec file_picker (utilisé partout)
+// ═══════════════════════════════════════════════════════════════════════════════
+class _DropZone extends StatefulWidget {
+  /// Callback appelé avec le nom du fichier sélectionné (null si annulé)
+  final void Function(String? fileName, String? filePath)? onFilePicked;
+
+  const _DropZone({this.onFilePicked});
+
+  @override
+  State<_DropZone> createState() => _DropZoneState();
+}
+
+class _DropZoneState extends State<_DropZone> {
+  String? _fileName;
+  String? _filePath;
+  bool _loading = false;
+  String? _error;
+
+  Future<void> _pickFile() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'docx'],
+        withData: false,
+        withReadStream: false,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        setState(() {
+          _fileName = file.name;
+          _filePath = file.path;
+        });
+        widget.onFilePicked?.call(file.name, file.path);
+      }
+    } catch (e) {
+      setState(() => _error = 'Erreur lors de la sélection du fichier.');
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+  void _clearFile() {
+    setState(() {
+      _fileName = null;
+      _filePath = null;
+      _error = null;
+    });
+    widget.onFilePicked?.call(null, null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasFile = _fileName != null;
+
+    return GestureDetector(
+      onTap: hasFile ? null : _pickFile,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        width: double.infinity,
+        constraints: const BoxConstraints(minHeight: 140),
+        decoration: BoxDecoration(
+          color: hasFile
+              ? kPrimary.withOpacity(0.06)
+              : const Color(0xFFF9FAFB),
+          border: Border.all(
+            color: _error != null
+                ? const Color(0xFFDC2626)
+                : hasFile
+                    ? kPrimary
+                    : kBorder,
+            width: hasFile ? 1.5 : 1,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: _loading
+            ? const SizedBox(
+                height: 140,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 28,
+                        height: 28,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2.5, color: kPrimary),
+                      ),
+                      SizedBox(height: 10),
+                      Text('Sélection du fichier...',
+                          style: TextStyle(fontSize: 12, color: kLightGrey)),
+                    ],
+                  ),
+                ),
+              )
+            : hasFile
+                ? _buildFilePreview()
+                : _buildDropPrompt(),
+      ),
+    );
+  }
+
+  Widget _buildDropPrompt() => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 28),
+          const Icon(Icons.cloud_upload_outlined, size: 36, color: kLightGrey),
+          const SizedBox(height: 10),
+          RichText(
+            text: const TextSpan(children: [
+              TextSpan(
+                  text: 'Déposez un fichier ou ',
+                  style: TextStyle(fontSize: 13, color: kLightGrey)),
+              TextSpan(
+                  text: 'parcourir',
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: kPrimary,
+                      fontWeight: FontWeight.w600)),
+            ]),
+          ),
+          const SizedBox(height: 6),
+          const Text('PDF, DOCX — 15 Mo max',
+              style: TextStyle(fontSize: 11, color: kLightGrey)),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(_error!,
+                style: const TextStyle(
+                    fontSize: 11, color: Color(0xFFDC2626))),
+          ],
+          const SizedBox(height: 28),
+        ],
+      );
+
+  Widget _buildFilePreview() => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Row(children: [
+          // Icône selon le type
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: _fileName!.endsWith('.pdf')
+                  ? const Color(0xFFFEE2E2)
+                  : const Color(0xFFDBEAFE),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              _fileName!.endsWith('.pdf')
+                  ? Icons.picture_as_pdf_outlined
+                  : Icons.description_outlined,
+              size: 26,
+              color: _fileName!.endsWith('.pdf')
+                  ? const Color(0xFFDC2626)
+                  : const Color(0xFF2563EB),
+            ),
+          ),
+          const SizedBox(width: 14),
+          // Nom du fichier
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _fileName!,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: kDark),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(children: [
+                    const Icon(Icons.check_circle,
+                        size: 14, color: kPrimary),
+                    const SizedBox(width: 4),
+                    const Text('Fichier sélectionné',
+                        style: TextStyle(fontSize: 11, color: kPrimary)),
+                  ]),
+                ]),
+          ),
+          // Bouton supprimer + changer
+          Column(children: [
+            GestureDetector(
+              onTap: _clearFile,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                    color: const Color(0xFFFEE2E2),
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Icon(Icons.close,
+                    size: 16, color: Color(0xFFDC2626)),
+              ),
+            ),
+            const SizedBox(height: 6),
+            GestureDetector(
+              onTap: _pickFile,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                    color: kPrimaryLight,
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Icon(Icons.edit_outlined,
+                    size: 16, color: kPrimary),
+              ),
+            ),
+          ]),
+        ]),
+      );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // COOPT BOTTOM SHEET
 // ═══════════════════════════════════════════════════════════════════════════════
 class _CooptBottomSheet extends StatefulWidget {
@@ -1605,6 +1793,8 @@ class _CooptBottomSheet extends StatefulWidget {
 
 class _CooptBottomSheetState extends State<_CooptBottomSheet> {
   int _stars = 0;
+  String? _cvFileName;
+
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
@@ -1612,7 +1802,6 @@ class _CooptBottomSheetState extends State<_CooptBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Handle
               Center(
                   child: Container(
                       width: 40,
@@ -1625,7 +1814,7 @@ class _CooptBottomSheetState extends State<_CooptBottomSheet> {
                 const Icon(Icons.business_center_outlined,
                     color: kDark, size: 20),
                 const SizedBox(width: 8),
-                const Text('Coopt a candidate',
+                const Text('Coopter un candidat',
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -1643,57 +1832,63 @@ class _CooptBottomSheetState extends State<_CooptBottomSheet> {
                 decoration: BoxDecoration(
                     color: kPrimary, borderRadius: BorderRadius.circular(8)),
                 child: const Text(
-                    'Please choose your trust rate\non candidate!',
+                    'Choisissez votre niveau de confiance\npour ce candidat !',
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w500)),
               ),
               const SizedBox(height: 14),
+              // Étoiles de confiance
               Row(children: [
                 ...List.generate(
                     5,
                     (i) => GestureDetector(
                           onTap: () => setState(() => _stars = i + 1),
-                          child: Icon(
-                              i < _stars ? Icons.star : Icons.star_border,
-                              color: Colors.amber,
-                              size: 32),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: Icon(
+                                i < _stars ? Icons.star : Icons.star_border,
+                                color: Colors.amber,
+                                size: 32),
+                          ),
                         )),
-                const SizedBox(width: 14),
-                TextButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.upload_outlined,
-                      color: kPrimary, size: 16),
-                  label: const Text('Upload',
-                      style: TextStyle(
-                          color: kPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600)),
-                ),
               ]),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
+              // Label upload CV
               Row(children: [
-                const Icon(Icons.refresh, color: kPrimary, size: 16),
+                const Icon(Icons.upload_file_outlined,
+                    color: kPrimary, size: 18),
                 const SizedBox(width: 6),
-                const Text('Upload CV',
+                const Text('Uploader le CV',
                     style: TextStyle(
                         color: kPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w600)),
               ]),
               const SizedBox(height: 10),
-              _DropZone(),
+              // DropZone avec callback
+              _DropZone(
+                onFilePicked: (name, path) =>
+                    setState(() => _cvFileName = name),
+              ),
               const SizedBox(height: 16),
+              // Boutons d'action
               Row(children: [
                 Expanded(
                     child: ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.refresh, size: 15),
-                  label: const Text('Add CVs'),
+                  onPressed: _cvFileName != null
+                      ? () {
+                          // TODO: envoyer le CV
+                          Navigator.of(context).pop();
+                        }
+                      : null,
+                  icon: const Icon(Icons.upload_file_outlined, size: 15),
+                  label: const Text('Envoyer le CV'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimary,
                     foregroundColor: Colors.white,
+                    disabledBackgroundColor: kBorder,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8)),
@@ -1706,7 +1901,7 @@ class _CooptBottomSheetState extends State<_CooptBottomSheet> {
                     child: ElevatedButton.icon(
                   onPressed: () {},
                   icon: const Icon(Icons.business_center_outlined, size: 15),
-                  label: const Text('Apply to Offer'),
+                  label: const Text('Postuler'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4CAF50),
                     foregroundColor: Colors.white,
@@ -1736,6 +1931,8 @@ class _ApplyBottomSheet extends StatefulWidget {
 
 class _ApplyBottomSheetState extends State<_ApplyBottomSheet> {
   final Map<String, int> _ratings = {};
+  String? _cvFileName;
+
   @override
   Widget build(BuildContext context) {
     final skills = widget.offer.tags;
@@ -1752,7 +1949,7 @@ class _ApplyBottomSheetState extends State<_ApplyBottomSheet> {
           const SizedBox(width: 16),
           const Icon(Icons.business_center_outlined, color: kDark, size: 20),
           const SizedBox(width: 8),
-          const Text('Apply to offer',
+          const Text('Postuler à l\'offre',
               style: TextStyle(
                   fontSize: 16, fontWeight: FontWeight.w700, color: kDark)),
           const Spacer(),
@@ -1767,25 +1964,49 @@ class _ApplyBottomSheetState extends State<_ApplyBottomSheet> {
             controller: widget.scrollController,
             padding: const EdgeInsets.all(20),
             children: [
+              // Upload CV
               Row(children: [
-                const Icon(Icons.refresh, color: kPrimary, size: 16),
+                const Icon(Icons.upload_file_outlined,
+                    color: kPrimary, size: 18),
                 const SizedBox(width: 6),
-                const Text('Upload CV',
+                const Text('Uploader le CV',
                     style: TextStyle(
                         color: kPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w600)),
                 const SizedBox(width: 6),
-                const Text('(optional)',
+                const Text('(optionnel)',
                     style: TextStyle(color: kLightGrey, fontSize: 13)),
               ]),
               const SizedBox(height: 10),
-              _DropZone(),
+              _DropZone(
+                onFilePicked: (name, path) =>
+                    setState(() => _cvFileName = name),
+              ),
+              // Message de confirmation fichier sélectionné
+              if (_cvFileName != null) ...[
+                const SizedBox(height: 8),
+                Row(children: [
+                  const Icon(Icons.check_circle, size: 14, color: kPrimary),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'CV prêt : $_cvFileName',
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: kPrimary,
+                          fontWeight: FontWeight.w500),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ]),
+              ],
               const SizedBox(height: 20),
+              // Auto-évaluation
               Row(children: [
-                const Icon(Icons.star_border, color: kPrimary, size: 16),
+                const Icon(Icons.star_border, color: kPrimary, size: 18),
                 const SizedBox(width: 6),
-                const Text('Self-assessment',
+                const Text('Auto-évaluation',
                     style: TextStyle(
                         color: kPrimary,
                         fontSize: 14,
@@ -1821,7 +2042,9 @@ class _ApplyBottomSheetState extends State<_ApplyBottomSheet> {
                                           si < (_ratings[skill] ?? 0)
                                               ? Icons.star
                                               : Icons.star_border,
-                                          color: const Color(0xFFD1D5DB),
+                                          color: si < (_ratings[skill] ?? 0)
+                                              ? Colors.amber
+                                              : const Color(0xFFD1D5DB),
                                           size: 22),
                                     ))),
                       ]),
@@ -1850,7 +2073,7 @@ class _ApplyBottomSheetState extends State<_ApplyBottomSheet> {
                   borderRadius: BorderRadius.circular(8)),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
             ),
-            child: const Text('Cancel',
+            child: const Text('Annuler',
                 style: TextStyle(color: kDark, fontSize: 13)),
           ),
           const SizedBox(width: 10),
@@ -1866,49 +2089,12 @@ class _ApplyBottomSheetState extends State<_ApplyBottomSheet> {
               textStyle:
                   const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
             ),
-            child: const Text('Apply'),
+            child: const Text('Postuler'),
           ),
         ]),
       ),
     ]);
   }
-}
-
-// ─── DROP ZONE ───────────────────────────────────────────────────────────────
-class _DropZone extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () {},
-        child: Container(
-          width: double.infinity,
-          height: 140,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF9FAFB),
-            border: Border.all(color: kBorder),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.cloud_download_outlined,
-                size: 32, color: kLightGrey),
-            const SizedBox(height: 8),
-            RichText(
-                text: const TextSpan(children: [
-              TextSpan(
-                  text: 'Drop file here or ',
-                  style: TextStyle(fontSize: 12, color: kLightGrey)),
-              TextSpan(
-                  text: 'browse',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: kPrimary,
-                      fontWeight: FontWeight.w600)),
-            ])),
-            const SizedBox(height: 4),
-            const Text('PDF, DOCX — 15 Mo max',
-                style: TextStyle(fontSize: 11, color: kLightGrey)),
-          ]),
-        ),
-      );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -2049,7 +2235,7 @@ class _AddOfferSheetState extends State<_AddOfferSheet> {
             const SizedBox(width: 16),
             const Icon(Icons.work_outline, color: kDark, size: 20),
             const SizedBox(width: 8),
-            const Text('Add Offer',
+            const Text('Ajouter une offre',
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w700, color: kDark)),
             const Spacer(),
@@ -2064,13 +2250,13 @@ class _AddOfferSheetState extends State<_AddOfferSheet> {
               controller: widget.scrollController,
               padding: const EdgeInsets.all(20),
               children: [
-                const Text('Offer Description',
+                const Text('Description de l\'offre',
                     style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: kPrimary)),
                 const SizedBox(height: 8),
-                _field(_descCtrl, 'Detailed description...', maxLines: 5),
+                _field(_descCtrl, 'Description détaillée...', maxLines: 5),
                 const SizedBox(height: 20),
                 const Text('Identification',
                     style: TextStyle(
@@ -2078,30 +2264,32 @@ class _AddOfferSheetState extends State<_AddOfferSheet> {
                         fontWeight: FontWeight.w700,
                         color: kPrimary)),
                 const SizedBox(height: 12),
-                _labeled('Title *', _field(_titleCtrl, 'Job title')),
+                _labeled('Titre *', _field(_titleCtrl, 'Intitulé du poste')),
                 const SizedBox(height: 12),
-                _labeled('Years of experience *', _field(_expCtrl, 'ex: 3')),
+                _labeled('Années d\'expérience *',
+                    _field(_expCtrl, 'ex: 3')),
                 const SizedBox(height: 12),
                 _dropdown('Type *', kTypeOptions, _type,
                     (v) => setState(() => _type = v)),
                 const SizedBox(height: 12),
-                _dropdown('Category *', kCategoryOptions, _category,
+                _dropdown('Catégorie *', kCategoryOptions, _category,
                     (v) => setState(() => _category = v)),
                 const SizedBox(height: 12),
-                _dropdown('Contract *', kContractOptions, _contract,
+                _dropdown('Contrat *', kContractOptions, _contract,
                     (v) => setState(() => _contract = v)),
                 const SizedBox(height: 20),
-                const Text('Logistics',
+                const Text('Logistique',
                     style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: kPrimary)),
                 const SizedBox(height: 12),
-                _labeled('Address *', _field(_addressCtrl, 'City or address')),
+                _labeled('Adresse *', _field(_addressCtrl, 'Ville ou adresse')),
                 const SizedBox(height: 12),
-                _labeled('Start Date *', _field(_startDateCtrl, 'YYYY-MM-DD')),
+                _labeled(
+                    'Date de début *', _field(_startDateCtrl, 'AAAA-MM-JJ')),
                 const SizedBox(height: 12),
-                _labeled('Duration *', _field(_durationCtrl, 'ex: 6 mois')),
+                _labeled('Durée *', _field(_durationCtrl, 'ex: 6 mois')),
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () => setState(() => _exclusive = !_exclusive),
@@ -2129,7 +2317,7 @@ class _AddOfferSheetState extends State<_AddOfferSheet> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Text('Exclusive offer (Challenge)',
+                    const Text('Offre exclusive (Challenge)',
                         style: TextStyle(
                             fontSize: 13, fontWeight: FontWeight.w500)),
                   ]),
@@ -2151,7 +2339,7 @@ class _AddOfferSheetState extends State<_AddOfferSheet> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
               ),
-              child: const Text('Cancel',
+              child: const Text('Annuler',
                   style: TextStyle(color: Color(0xFF374151), fontSize: 13)),
             ),
             const SizedBox(width: 10),
@@ -2168,7 +2356,7 @@ class _AddOfferSheetState extends State<_AddOfferSheet> {
                 textStyle:
                     const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
               ),
-              child: const Text('Submit'),
+              child: const Text('Soumettre'),
             ),
           ]),
         ),

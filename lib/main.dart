@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_theme.dart';
+import 'providers/api_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/personalcalendar_screen.dart';
 import 'screens/my_tasks_screen.dart';
@@ -18,24 +19,22 @@ class CooptaliteApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AppTheme(),
-      child: Consumer<AppTheme>(
-        builder: (context, appTheme, _) {
-          return MaterialApp(
-            title: 'Cooptalite',
-            debugShowCheckedModeBanner: false,
-            theme: appTheme.getTheme(),
-            darkTheme: appTheme.getTheme(),
-            themeMode: appTheme.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            home: const LoginScreen(),
-            routes: {
-              '/calendar': (context) => const PersonalCalendarScreen(),
-              '/tasks': (context) => const MyTasksScreen(),
-              '/news': (context) => const NewsScreen(),
-              '/events': (context) => const EventsScreen(),
-            },
-          );
+    final appTheme = AppTheme();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => appTheme),
+        ChangeNotifierProvider(create: (context) => ApiProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Cooptalite',
+        debugShowCheckedModeBanner: false,
+        theme: appTheme.getTheme(),
+        home: const LoginScreen(),
+        routes: {
+          '/calendar': (context) => const PersonalCalendarScreen(),
+          '/tasks': (context) => const MyTasksScreen(),
+          '/news': (context) => const NewsScreen(),
+          '/events': (context) => const EventsScreen(),
         },
       ),
     );

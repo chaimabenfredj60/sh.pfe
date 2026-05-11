@@ -265,7 +265,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // ─── Stats Section ────────────────────────────────────────────────────────
   Widget _buildStatsSection(BuildContext context, AppTheme appTheme) {
     final data = _currentData;
-    final isWide = _isWide(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

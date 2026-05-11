@@ -1,38 +1,3 @@
-import 'package:flutter/material.dart';
-
-class AppProvider extends ChangeNotifier {
-  bool _isDarkMode = false;
-  String _language = 'en'; // 'en' or 'fr'
-
-  bool get isDarkMode => _isDarkMode;
-  String get language => _language;
-
-  void toggleDarkMode() {
-    _isDarkMode = !_isDarkMode;
-    notifyListeners();
-  }
-
-  void setLanguage(String lang) {
-    if (lang == 'en' || lang == 'fr') {
-      _language = lang;
-      notifyListeners();
-    }
-  }
-
-  ThemeData get theme {
-    if (_isDarkMode) {
-      return ThemeData.dark().copyWith(
-        primaryColor: const Color(0xFF00B4A6),
-        scaffoldBackgroundColor: const Color(0xFF1e1e1e),
-      );
-    }
-    return ThemeData.light().copyWith(
-      primaryColor: const Color(0xFF00B4A6),
-      scaffoldBackgroundColor: Colors.white,
-    );
-  }
-}
-
 class AppLocalizations {
   static final Map<String, Map<String, String>> _translations = {
     'en': {

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
 /// Interface de base pour tous les écrans
-/// Cela permet à tous les écrans d'accepter isDarkMode et language
+/// Cela permet à tous les écrans d'accepter language
 abstract class ThemeAwareScreen extends StatelessWidget {
-  final bool isDarkMode;
   final String language;
 
   const ThemeAwareScreen({
-    required this.isDarkMode,
     required this.language,
     Key? key,
   }) : super(key: key);

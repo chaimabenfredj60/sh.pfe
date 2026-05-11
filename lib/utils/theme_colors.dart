@@ -43,27 +43,27 @@ class ThemeColors {
   static const Color darkBorder = Color(0xFF2D3546);
   static const Color darkSecondaryText = Color(0xFFB0B0B0);
 
-  static Color getBgColor(bool isDarkMode) {
-    return isDarkMode ? darkBg : lightBg;
+  static Color getBgColor() {
+    return lightBg;
   }
 
-  static Color getCardBgColor(bool isDarkMode) {
-    return isDarkMode ? darkCardBg : Colors.white;
+  static Color getCardBgColor() {
+    return Colors.white;
   }
 
-  static Color getTextColor(bool isDarkMode) {
-    return isDarkMode ? darkText : lightText;
+  static Color getTextColor() {
+    return lightText;
   }
 
-  static Color getSecondaryTextColor(bool isDarkMode) {
-    return isDarkMode ? darkSecondaryText : lightSecondaryText;
+  static Color getSecondaryTextColor() {
+    return lightSecondaryText;
   }
 
-  static Color getBorderColor(bool isDarkMode) {
-    return isDarkMode ? darkBorder : lightBorder;
+  static Color getBorderColor() {
+    return lightBorder;
   }
 
-  static Color getHintTextColor(bool isDarkMode) {
-    return isDarkMode ? const Color(0xFF9E9E9E) : Color(0xFF9E9E9E);
+  static Color getHintTextColor() {
+    return const Color(0xFF9E9E9E);
   }
 }

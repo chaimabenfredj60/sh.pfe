@@ -29,12 +29,10 @@ class ChatMessage {
 }
 
 class ChatScreen extends StatefulWidget {
-  final bool isDarkMode;
   final String language;
 
   const ChatScreen({
     super.key,
-    this.isDarkMode = false,
     this.language = 'en',
   });
   @override
@@ -153,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   onChanged: (v) => setState(() => _search = v),
                   style: const TextStyle(fontSize: 13),
                   decoration: InputDecoration(
-                    hintText: 'Search or start a new chat',
+                    hintText: appTheme.translate('chat_search_hint'),
                     hintStyle:
                         const TextStyle(fontSize: 11, color: Color(0xFFBDBDBD)),
                     prefixIcon: const Icon(Icons.search,
@@ -185,12 +183,12 @@ class _ChatScreenState extends State<ChatScreen> {
                           fontSize: 13,
                           color: Color(0xFF1A1A2E)))),
             ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Contacts',
-                      style: TextStyle(
+                  child: Text(appTheme.translate('chat_contacts_label'),
+                      style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                           color: Color(0xFF9E9E9E)))),
@@ -409,7 +407,10 @@ class _ChatScreenState extends State<ChatScreen> {
             child: const Icon(Icons.chat_bubble_outline,
                 size: 28, color: Color(0xFFBDBDBD))),
         const SizedBox(height: 12),
-        const Text('Start Conversation',
-            style: TextStyle(fontSize: 14, color: Color(0xFF9E9E9E))),
+        Consumer<AppTheme>(
+          builder: (ctx, appTheme, _) => Text(
+              appTheme.translate('chat_empty_title'),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF9E9E9E))),
+        ),
       ]));
 }

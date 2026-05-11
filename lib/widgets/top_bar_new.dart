@@ -1,228 +1,130 @@
 import 'package:flutter/material.dart';
-import 'feedback_dialog.dart';
-import '../providers/app_provider.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_theme.dart';
 
-class TopBar extends StatefulWidget {
+class TopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onProfile;
-  final VoidCallback? onApplication;
-  final VoidCallback? onJackpot;
-  final VoidCallback? onChats;
-  final VoidCallback? onSupport;
   final VoidCallback? onLogout;
-  final Function(String)? onLanguageChanged;
-  final Function(bool)? onThemeChanged;
-  final String currentLanguage;
-  final bool isDarkMode;
 
   const TopBar({
-    Key? key,
+    super.key,
     this.onProfile,
-    this.onApplication,
-    this.onJackpot,
-    this.onChats,
-    this.onSupport,
     this.onLogout,
-    this.onLanguageChanged,
-    this.onThemeChanged,
-    this.currentLanguage = 'en',
-    this.isDarkMode = false,
-  }) : super(key: key);
+  });
 
   @override
-  State<TopBar> createState() => _TopBarState();
-}
-
-class _TopBarState extends State<TopBar> {
-  late bool _isDarkMode;
-  late String _language;
-
-  @override
-  void initState() {
-    super.initState();
-    _isDarkMode = widget.isDarkMode;
-    _language = widget.currentLanguage;
-  }
-
-  String _translate(String key) {
-    return AppLocalizations.translate(key, _language);
-  }
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: _isDarkMode ? Colors.grey[900] : Colors.white,
-      child: Row(
-        children: [
-          // Left side - Info & Links
-          Row(
+    return Consumer<AppTheme>(
+      builder: (context, appTheme, _) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final bgColor = isDark ? const Color(0xFF1A1F2E) : Colors.white;
+        final textColor = isDark ? Colors.white : const Color(0xFF1A1A1A);
+
+        return Container(
+          height: preferredSize.height,
+          color: bgColor,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: Row(
             children: [
-              // Info icon
-              IconButton(
-                icon: Icon(Icons.info_outline,
-                    size: 20, color: _isDarkMode ? Colors.white : Colors.black),
-                onPressed: () {},
-                tooltip: 'Information',
-              ),
-              const SizedBox(width: 8),
-              // Request document link
-              TextButton(
-                onPressed: () {},
-                child: Row(
-                  children: [
-                    Icon(Icons.folder_open, size: 16, color: Colors.teal),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Request a document or information',
-                      style: TextStyle(
-                        color: Colors.teal,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+              // Logo/Title
+              Text(
+                'Cooptalite',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
-              const SizedBox(width: 8),
-              // My documents link
-              TextButton(
-                onPressed: () {},
-                child: Row(
-                  children: [
-                    Icon(Icons.folder_open, size: 16, color: Colors.teal),
-                    const SizedBox(width: 6),
-                    Text(
-                      'My documents / responses',
-                      style: TextStyle(
-                        color: Colors.teal,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          // Right side - Actions & User
-          Row(
-            children: [
-              // Language Dropdown
-              DropdownButton<String>(
-                value: _language,
-                underline: const SizedBox(),
-                icon: Icon(Icons.language,
-                    size: 18, color: _isDarkMode ? Colors.white : Colors.grey),
-                items: [
-                  DropdownMenuItem(
+              const Spacer(),
+              // Language Selector
+              PopupMenuButton<String>(
+                onSelected: (String value) {
+                  appTheme.setLanguage(value);
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
                     value: 'en',
-                    child: Text('English',
-                        style: TextStyle(
-                            color: _isDarkMode ? Colors.white : Colors.black)),
+                    child: Row(
+                      children: [
+                        if (appTheme.language == 'en')
+                          const Icon(Icons.check,
+                              color: Color(0xFF1F4788), size: 18)
+                        else
+                          const SizedBox(width: 18),
+                        const SizedBox(width: 8),
+                        const Text('English'),
+                      ],
+                    ),
                   ),
-                  DropdownMenuItem(
+                  PopupMenuItem<String>(
                     value: 'fr',
-                    child: Text('Français',
-                        style: TextStyle(
-                            color: _isDarkMode ? Colors.white : Colors.black)),
+                    child: Row(
+                      children: [
+                        if (appTheme.language == 'fr')
+                          const Icon(Icons.check,
+                              color: Color(0xFF1F4788), size: 18)
+                        else
+                          const SizedBox(width: 18),
+                        const SizedBox(width: 8),
+                        const Text('Français'),
+                      ],
+                    ),
                   ),
                 ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _language = value);
-                    widget.onLanguageChanged?.call(value);
-                  }
-                },
-              ),
-              const SizedBox(width: 8),
-              // Dark mode toggle
-              IconButton(
-                icon: Icon(
-                  _isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                  size: 20,
-                  color: _isDarkMode ? Colors.white : Colors.grey,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.language,
+                          size: 20,
+                          color: isDark
+                              ? Colors.grey.shade300
+                              : Colors.grey.shade600),
+                      const SizedBox(width: 4),
+                      Text(
+                        appTheme.language.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? Colors.grey.shade300
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                onPressed: () {
-                  setState(() => _isDarkMode = !_isDarkMode);
-                  widget.onThemeChanged?.call(_isDarkMode);
-                },
-                tooltip: 'Toggle Dark Mode',
               ),
-              const SizedBox(width: 8),
-              // Search
-              IconButton(
-                icon: Icon(Icons.search,
-                    size: 20, color: _isDarkMode ? Colors.white : Colors.grey),
-                onPressed: () {},
-              ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 16),
               // Notifications
               Stack(
                 children: [
                   IconButton(
                     icon: Icon(Icons.notifications_none,
                         size: 20,
-                        color: _isDarkMode ? Colors.white : Colors.grey),
+                        color: isDark
+                            ? Colors.grey.shade300
+                            : Colors.grey.shade600),
                     onPressed: () {},
+                    tooltip: 'Notifications',
                   ),
                   Positioned(
                     right: 8,
                     top: 8,
                     child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
+                      width: 16,
+                      height: 16,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE74C3C),
+                        shape: BoxShape.circle,
                       ),
-                      constraints:
-                          const BoxConstraints(minWidth: 18, minHeight: 18),
-                      child: const Text(
-                        '1',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 16),
-              // User Profile
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Colors.grey[300],
-                    child: Icon(Icons.person,
-                        size: 18,
-                        color: _isDarkMode ? Colors.grey[800] : Colors.grey),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Membre',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: _isDarkMode ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'member',
+                      child: const Center(
+                        child: Text(
+                          '1',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -230,99 +132,28 @@ class _TopBarState extends State<TopBar> {
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(width: 8),
-              // Dropdown menu
+              const SizedBox(width: 16),
+              // User Menu
               PopupMenuButton<String>(
-                icon: Icon(Icons.expand_more,
-                    size: 20, color: _isDarkMode ? Colors.white : Colors.grey),
                 onSelected: (String value) {
-                  switch (value) {
-                    case 'profile':
-                      widget.onProfile?.call();
-                      break;
-                    case 'application':
-                      widget.onApplication?.call();
-                      break;
-                    case 'jackpot':
-                      widget.onJackpot?.call();
-                      break;
-                    case 'chats':
-                      widget.onChats?.call();
-                      break;
-                    case 'support':
-                      showDialog(
-                        context: context,
-                        builder: (context) =>
-                            FeedbackDialog(language: _language),
-                      );
-                      break;
-                    case 'logout':
-                      widget.onLogout?.call();
-                      break;
+                  if (value == 'profile') {
+                    onProfile?.call();
+                  } else if (value == 'logout') {
+                    onLogout?.call();
                   }
                 },
-                itemBuilder: (BuildContext context) => [
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   PopupMenuItem<String>(
                     value: 'profile',
                     child: Row(
                       children: [
-                        Icon(Icons.person,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
+                        const Icon(Icons.person, size: 18),
                         const SizedBox(width: 10),
-                        Text(_translate('profile')),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'application',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit_note,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
-                        const SizedBox(width: 10),
-                        Text(_translate('my_application')),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'jackpot',
-                    child: Row(
-                      children: [
-                        Icon(Icons.casino,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
-                        const SizedBox(width: 10),
-                        Text(_translate('my_jackpot')),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'chats',
-                    child: Row(
-                      children: [
-                        Icon(Icons.chat,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
-                        const SizedBox(width: 10),
-                        Text(_translate('chats')),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'support',
-                    child: Row(
-                      children: [
-                        Icon(Icons.help,
-                            size: 18,
-                            color: _isDarkMode ? Colors.white : Colors.grey),
-                        const SizedBox(width: 10),
-                        Text(_translate('support')),
+                        Text(appTheme.translate('profile')),
                       ],
                     ),
                   ),
@@ -331,19 +162,30 @@ class _TopBarState extends State<TopBar> {
                     value: 'logout',
                     child: Row(
                       children: [
-                        const Icon(Icons.logout, size: 18, color: Colors.red),
+                        const Icon(Icons.logout, size: 18),
                         const SizedBox(width: 10),
-                        Text(_translate('logout'),
-                            style: const TextStyle(color: Colors.red)),
+                        Text(appTheme.translate('logout')),
                       ],
                     ),
                   ),
                 ],
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: const Color(0xFF1F4788),
+                  child: Text(
+                    'BW',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

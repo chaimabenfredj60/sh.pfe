@@ -1,0 +1,1 @@
+ build\\web\\manifest.json:  C:\\Users\\Pc-Asus\\Desktop\\mobile\ 1\\sh_flutter\\web\\index.html C:\\Users\\Pc-Asus\\Desktop\\mobile\ 1\\sh_flutter\\web\\manifest.json

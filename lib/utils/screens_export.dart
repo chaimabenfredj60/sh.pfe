@@ -1,6 +1,5 @@
-
 // Exemple de wrapper pour un écran simple
-// Les écrans nécessitent juste d'être envelopper avec isDarkMode et language
+// Les écrans nécessitent juste d'être envelopper avec language
 export '../screens/dashboard_screen.dart' show DashboardScreen;
 export '../screens/offer_list_screen.dart' show OfferListScreen;
 export '../screens/cra_screen.dart' show CraScreen;
